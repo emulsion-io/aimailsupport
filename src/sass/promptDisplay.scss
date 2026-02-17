@@ -25,10 +25,15 @@
   --textarea-border: rgba(0, 0, 0, 0.14);
   --textarea-glow: rgba(77, 163, 255, 0.25);
   --textarea-focus: #4da3ff;
+  --neon-blue: #4da3ff;
+  --neon-blue-soft: rgba(77, 163, 255, 0.3);
 
   background-color: var(--bg-color);
+  border: 1px solid color-mix(in srgb, var(--neon-blue) 55%, rgba(0, 0, 0, 0.2) 45%);
   border-radius: 10px;
-  box-shadow: 0 0 10px rgba(black, .5);
+  box-shadow:
+    0 0 10px rgba(black, .35),
+    0 0 18px var(--neon-blue-soft);
   color: var(--text-color);
   font-size: 14px;
   margin-right: 60px;
@@ -50,6 +55,8 @@
     --textarea-border: rgba(255, 255, 255, 0.14);
     --textarea-glow: rgba(77, 163, 255, 0.28);
     --textarea-focus: #4da3ff; // change if you want another accent in dark
+    --neon-blue: #65b5ff;
+    --neon-blue-soft: rgba(101, 181, 255, 0.35);
   }
 
   textarea {
@@ -97,11 +104,13 @@
     right: 25px;
     top: 50%;
     transform: translateY(-50%);
-    transition: background-color .4s ease, opacity .2s ease;
+    transition: background-color .4s ease, opacity .2s ease, box-shadow .25s ease;
     width: 40px;
+    box-shadow: 0 0 10px rgba(77, 163, 255, 0.22);
 
     &:hover {
       background-color: color-mix(in srgb, var(--button-bg) 80%, var(--textarea-focus) 20%);
+      box-shadow: 0 0 14px var(--neon-blue-soft);
       opacity: 0.9;
     }
 
