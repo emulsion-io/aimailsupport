@@ -93,7 +93,43 @@ function thinking(thinkingText: string) {
     clearOutputDisplay()
 
     getInnerResponse().classList.add('thinking')
-    getInnerResponse().querySelector('#amsContent').innerHTML = `${thinkingText}<span class="dots"></span>`
+
+    const content = getInnerResponse().querySelector('#amsContent')
+    content.appendChild(createThinkingLoaderElement())
+
+    const thinkingLabel = document.createElement('span')
+    thinkingLabel.className = 'thinking-label'
+    thinkingLabel.textContent = thinkingText
+
+    const dots = document.createElement('span')
+    dots.className = 'dots'
+    thinkingLabel.appendChild(dots)
+
+    content.appendChild(thinkingLabel)
+}
+
+function createThinkingLoaderElement(): HTMLDivElement {
+    const loader = document.createElement('div')
+    loader.id = 'amsThinkingLoader'
+    loader.className = 'loader'
+    loader.innerHTML = `
+        <svg width="100" height="100" viewBox="0 0 100 100" aria-hidden="true">
+            <defs>
+                <mask id="amsLoaderClipping">
+                    <polygon points="0,0 100,0 100,100 0,100" fill="black"></polygon>
+                    <polygon points="25,25 75,25 50,75" fill="white"></polygon>
+                    <polygon points="50,25 75,75 25,75" fill="white"></polygon>
+                    <polygon points="35,35 65,35 50,65" fill="white"></polygon>
+                    <polygon points="35,35 65,35 50,65" fill="white"></polygon>
+                    <polygon points="35,35 65,35 50,65" fill="white"></polygon>
+                    <polygon points="35,35 65,35 50,65" fill="white"></polygon>
+                </mask>
+            </defs>
+        </svg>
+        <div class="box"></div>
+    `
+
+    return loader
 }
 
 // Support function to create the container where various details
@@ -147,11 +183,6 @@ async function createOutputDisplay(): Promise<void> {
     amsInnerResponse.appendChild(cssLink)
 
     // Contents -->
-    const image: HTMLImageElement = document.createElement('img')
-    image.id = 'amsImage'
-    image.src = browser.runtime.getURL('/images/bot-icon-color-64.webp')
-    amsInnerResponse.appendChild(image)
-
     const content: HTMLDivElement = document.createElement('div')
     content.id = 'amsContent'
     if (theme === 'dark') {
