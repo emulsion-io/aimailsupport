@@ -5,7 +5,7 @@ import removeMarkdown from 'remove-markdown'
 // Manage async messages -->
 browser.runtime.onMessage.addListener(async (message: any) => {
     if (message?.type) {
-        createOutputDisplay()
+        await createOutputDisplay()
 
         switch (message.type) {
             case 'addAudio':
@@ -100,14 +100,29 @@ function thinking(thinkingText: string) {
 // populated by AI systems will be inserted.
 async function createOutputDisplay(): Promise<void> {
 
+    // Get theme from storage
+    const result = await browser.storage.sync.get('theme')
+    const theme = result.theme || 'default'
+
+    // If the container already exists, just synchronize the theme
+    const existingInnerResponse = getInnerResponse()
+    if(existingInnerResponse) {
+        const existingContent = existingInnerResponse.querySelector('#amsContent')
+
+        if (theme === 'dark') {
+            existingInnerResponse.classList.add('dark')
+            existingContent?.classList.add('dark')
+        } else {
+            existingInnerResponse.classList.remove('dark')
+            existingContent?.classList.remove('dark')
+        }
+        return
+    }
+
     // Avoid creating the element if it already exists
     if(document.querySelector('#amsOuterResponse')) {
         return
     }
-
-    // Get theme from storage
-    const result = await browser.storage.sync.get('theme')
-    const theme = result.theme || 'default'
 
     // Main container for the AI model response
     const amsOuterResponse: HTMLDivElement = document.createElement('div')
@@ -120,6 +135,9 @@ async function createOutputDisplay(): Promise<void> {
     // Inner container for the AI model response
     const amsInnerResponse: HTMLDivElement = document.createElement('div')
     amsInnerResponse.id = 'amsInnerResponse'
+    if (theme === 'dark') {
+        amsInnerResponse.classList.add('dark')
+    }
     shadowRoot.appendChild(amsInnerResponse)
 
     // Add the CSS file to the shadow root

@@ -2,6 +2,22 @@
 
 // ams => AI Mail Support
 #amsOuterResponse {
+    --bg-color: #ffffff;
+    --text-color: #111111;
+    --bar-bg: #4CAF50;
+    --bar-unsafe: #F44336;
+    --border-color: gray;
+    --svg-color: #111111;
+
+    &.dark {
+        --bg-color: #2b2b2b;
+        --text-color: #e0e0e0;
+        --bar-bg: #66BB6A;
+        --bar-unsafe: #EF5350;
+        --border-color: #666666;
+        --svg-color: #e0e0e0;
+    }
+
     bottom: 10px;
     display: none;
     left: 50%;
@@ -19,6 +35,22 @@
 
 // Style for the shadow DOM
 #amsInnerResponse {
+    --bg-color: #ffffff;
+    --text-color: #111111;
+    --bar-bg: #4CAF50;
+    --bar-unsafe: #F44336;
+    --border-color: gray;
+    --svg-color: #111111;
+
+    &.dark {
+        --bg-color: #2b2b2b;
+        --text-color: #e0e0e0;
+        --bar-bg: #66BB6A;
+        --bar-unsafe: #EF5350;
+        --border-color: #666666;
+        --svg-color: #e0e0e0;
+    }
+
     &.error #amsContent {
         @include alert-danger;
     }
@@ -30,12 +62,14 @@
     }
 
     #amsContent {
-        --bg-color: white;
-        --text-color: black;
-        --bar-bg: #4CAF50;
-        --bar-unsafe: #F44336;
-        --border-color: gray;
-        --svg-color: black;
+        &.dark {
+            --bg-color: #2b2b2b;
+            --text-color: #e0e0e0;
+            --bar-bg: #66BB6A;
+            --bar-unsafe: #EF5350;
+            --border-color: #666666;
+            --svg-color: #e0e0e0;
+        }
 
         background-color: var(--bg-color);
         border-radius: 10px;
@@ -46,15 +80,6 @@
         max-height: 50vh;
         overflow-y: auto;
         padding: 15px 35px 15px 25px;
-
-        &.dark {
-            --bg-color: #2b2b2b;
-            --text-color: #e0e0e0;
-            --bar-bg: #66BB6A;
-            --bar-unsafe: #EF5350;
-            --border-color: #666666;
-            --svg-color: #e0e0e0;
-        }
 
         audio {
             display: block;
@@ -126,12 +151,15 @@
         span {
             cursor: pointer;
             font-size: 13px;
-            display: inline-block;
-
-            & + span {
-                margin-left: 5px;
-            }
-
+            background-color: var(--bg-color);
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(black, .5);
+            color: var(--text-color);
+            font-size: 14px;
+            margin-right: 60px;
+            max-height: 50vh;
+            overflow-y: auto;
+            padding: 15px 35px 15px 25px;
             svg {
                 color: var(--svg-color);
                 height: 16px;
