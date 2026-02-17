@@ -98,12 +98,16 @@ function thinking(thinkingText: string) {
 
 // Support function to create the container where various details
 // populated by AI systems will be inserted.
-function createOutputDisplay(): void {
+async function createOutputDisplay(): Promise<void> {
 
     // Avoid creating the element if it already exists
     if(document.querySelector('#amsOuterResponse')) {
         return
     }
+
+    // Get theme from storage
+    const result = await browser.storage.sync.get('theme')
+    const theme = result.theme || 'default'
 
     // Main container for the AI model response
     const amsOuterResponse: HTMLDivElement = document.createElement('div')
@@ -132,6 +136,9 @@ function createOutputDisplay(): void {
 
     const content: HTMLDivElement = document.createElement('div')
     content.id = 'amsContent'
+    if (theme === 'dark') {
+        content.classList.add('dark')
+    }
     amsInnerResponse.appendChild(content)
 
     // Close icon

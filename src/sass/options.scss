@@ -8,7 +8,7 @@ $options-labels-width: 150px;
 
     &.submit-attempt input:invalid,
     &.submit-attempt select:invalid {
-        border: 2px solid red;
+        border: 2px solid rgb(255, 64, 64);
     }
 
     #testResult {
@@ -170,7 +170,7 @@ $options-labels-width: 150px;
                 }
 
                 strong {
-                    color: red;
+                    color: rgb(255, 64, 64);
                 }
             }
 
@@ -188,7 +188,7 @@ $options-labels-width: 150px;
                 }
 
                 strong {
-                    color: red;
+                    color: rgb(255, 64, 64);
                 }
             }
 
@@ -204,7 +204,7 @@ $options-labels-width: 150px;
                 }
 
                 strong {
-                    color: red;
+                    color: rgb(255, 64, 64);
                 }
             }
 

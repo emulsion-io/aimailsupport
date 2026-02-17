@@ -9,6 +9,7 @@ export interface ConfigType {
     servicesTimeout: number
     maskPii: boolean
     debugMode: boolean
+    theme: string
 
     anthropic: {
         apiKey: string

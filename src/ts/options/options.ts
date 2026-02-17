@@ -84,6 +84,7 @@ document.querySelector('#optionsForm').addEventListener('submit', async (event) 
         servicesTimeout: Number.parseInt(document.querySelector<HTMLInputElement>('#servicesTimeout').value),
         maskPii: document.querySelector<HTMLInputElement>('#maskPii').checked,
         debugMode: document.querySelector<HTMLInputElement>('#debugMode').checked,
+        theme: document.querySelector<HTMLInputElement>('#theme').value,
         anthropic: {
             apiKey: document.querySelector<HTMLInputElement>('#anthropicApiKey').value,
             model: document.querySelector<HTMLInputElement>('#anthropicModel').value
@@ -172,6 +173,7 @@ document.addEventListener('DOMContentLoaded', async _ => {
     document.querySelector<HTMLInputElement>('#servicesTimeout').value = (configs.servicesTimeout || 12).toString()
     document.querySelector<HTMLInputElement>('#maskPii').checked = configs.maskPii
     document.querySelector<HTMLInputElement>('#debugMode').checked = configs.debugMode
+    document.querySelector<HTMLInputElement>('#theme').value = configs.theme || 'default'
 
     // Anthropic Claude section -->
     document.querySelector<HTMLInputElement>('#anthropicApiKey').value = configs.anthropic?.apiKey || ''
