@@ -256,4 +256,39 @@ $options-labels-width: 150px;
             display: block;
         }
     }
+
+    #customPrompts {
+        display: block;
+
+        #customPromptsList {
+            .custom-prompt-item {
+                border: 1px solid #d0d0d0;
+                border-radius: 6px;
+                margin-bottom: 10px;
+                padding: 10px;
+
+                .form-group {
+                    margin-bottom: 8px;
+                }
+
+                textarea {
+                    min-height: 70px;
+                    resize: vertical;
+                }
+
+                .custom-prompt-buttons {
+                    display: flex;
+                    gap: 8px;
+                    justify-content: flex-end;
+                    padding-left: calc($options-labels-width + 10px);
+                }
+            }
+        }
+
+        .custom-prompts-actions {
+            button {
+                margin-left: 0;
+            }
+        }
+    }
 }

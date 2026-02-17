@@ -207,6 +207,10 @@
         "message": "Invite personnalisée",
         "description": "Option de menu pour appliquer une invite définie par l'utilisateur."
     },
+    "mailCustomPrompts": {
+        "message": "Prompts personnalisés",
+        "description": "Titre du sous-menu listant les prompts personnalisés enregistrés."
+    },
     "mailExplain": {
         "message": "Expliquer",
         "description": "Option de menu pour expliquer le contenu d'un e-mail ou d'une partie de celui-ci."
@@ -501,9 +505,45 @@
         "message": "Thème",
         "description": "Option pour sélectionner le thème de l'interface."
     },
+    "options.customPrompts": {
+        "message": "Prompts personnalisés",
+        "description": "Section de gestion des prompts personnalisés."
+    },
+    "options.customPrompts.description": {
+        "message": "Ajoutez vos prompts personnalisés, définissez leur ordre, puis enregistrez. Ils apparaîtront dans le sous-menu \"Prompts personnalisés\".",
+        "description": "Description de la section dédiée à la gestion des prompts personnalisés."
+    },
+    "options.customPrompts.add": {
+        "message": "Ajouter un prompt",
+        "description": "Bouton permettant d'ajouter un prompt personnalisé."
+    },
+    "options.customPrompts.title": {
+        "message": "Titre",
+        "description": "Libellé du champ titre pour un prompt personnalisé."
+    },
+    "options.customPrompts.prompt": {
+        "message": "Prompt",
+        "description": "Libellé du champ de texte du prompt personnalisé."
+    },
+    "options.customPrompts.up": {
+        "message": "Monter",
+        "description": "Bouton pour remonter un prompt dans la liste."
+    },
+    "options.customPrompts.down": {
+        "message": "Descendre",
+        "description": "Bouton pour descendre un prompt dans la liste."
+    },
+    "options.customPrompts.remove": {
+        "message": "Supprimer",
+        "description": "Bouton pour supprimer un prompt personnalisé."
+    },
     "promptDisplay.placeholder": {
         "message": "Comment puis-je vous aider ?",
         "description": "Texte d'espace réservé pour la zone de texte où l'utilisateur peut interagir directement avec le LLM."
+    },
+    "errorCustomPromptNotFound": {
+        "message": "Le prompt personnalisé sélectionné est introuvable.",
+        "description": "Erreur affichée lorsqu'un prompt enregistré n'existe plus au moment du clic dans le menu."
     },
     "thinking": {
         "message": "Je réfléchis !",

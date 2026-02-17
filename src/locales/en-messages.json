@@ -207,6 +207,10 @@
         "message": "Custom Prompt",
         "description": "Menu option to apply a user-defined prompt."
     },
+    "mailCustomPrompts": {
+        "message": "Custom prompts",
+        "description": "Submenu title listing saved custom prompts."
+    },
     "mailExplain": {
         "message": "Explain",
         "description": "Menu option to explain the content of an email or a portion of it."
@@ -501,9 +505,45 @@
         "message": "Theme",
         "description": "Option to select the interface theme."
     },
+    "options.customPrompts": {
+        "message": "Custom prompts",
+        "description": "Section used to manage custom prompts."
+    },
+    "options.customPrompts.description": {
+        "message": "Add your custom prompts, set their order, then save. They will appear in the \"Custom prompts\" submenu.",
+        "description": "Description for the custom prompts management section."
+    },
+    "options.customPrompts.add": {
+        "message": "Add prompt",
+        "description": "Button used to add a new custom prompt."
+    },
+    "options.customPrompts.title": {
+        "message": "Title",
+        "description": "Label for custom prompt title field."
+    },
+    "options.customPrompts.prompt": {
+        "message": "Prompt",
+        "description": "Label for custom prompt text field."
+    },
+    "options.customPrompts.up": {
+        "message": "Up",
+        "description": "Button used to move a custom prompt up."
+    },
+    "options.customPrompts.down": {
+        "message": "Down",
+        "description": "Button used to move a custom prompt down."
+    },
+    "options.customPrompts.remove": {
+        "message": "Remove",
+        "description": "Button used to remove a custom prompt."
+    },
     "promptDisplay.placeholder": {
         "message": "How can I help you?",
         "description": "Placeholder text for the textbox where the user can directly interact with the LLM."
+    },
+    "errorCustomPromptNotFound": {
+        "message": "Selected custom prompt was not found.",
+        "description": "Error displayed when a saved custom prompt no longer exists at click time."
     },
     "thinking": {
         "message": "I'm thinking!",

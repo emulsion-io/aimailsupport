@@ -2,6 +2,11 @@ import { ConfigType } from '../helpers/configType'
 import { getConfigs, localizeNodes } from '../helpers/utils'
 import { ProviderFactory } from '../llmProviders/providerFactory'
 
+type CustomPrompt = {
+    title: string
+    prompt: string
+}
+
 // Internationalization message management
 localizeNodes()
 
@@ -34,6 +39,44 @@ document.querySelectorAll('#optionsForm select').forEach((node) => {
     node.addEventListener('change', () => {
         document.querySelector<HTMLButtonElement>('#optionsForm button.test').disabled = true
     })
+})
+
+const customPromptsList = document.querySelector<HTMLDivElement>('#customPromptsList')
+
+document.querySelector('#addCustomPrompt').addEventListener('click', () => {
+    appendCustomPromptItem()
+    document.querySelector<HTMLButtonElement>('#optionsForm button.test').disabled = true
+})
+
+customPromptsList.addEventListener('click', (event: Event) => {
+    const target = event.target as HTMLElement
+    const item = target.closest('.custom-prompt-item') as HTMLDivElement | null
+
+    if (!item) {
+        return
+    }
+
+    if (target.classList.contains('custom-prompt-delete')) {
+        item.remove()
+    }
+    else if (target.classList.contains('custom-prompt-up')) {
+        const previous = item.previousElementSibling
+        if (previous) {
+            customPromptsList.insertBefore(item, previous)
+        }
+    }
+    else if (target.classList.contains('custom-prompt-down')) {
+        const next = item.nextElementSibling
+        if (next) {
+            customPromptsList.insertBefore(next, item)
+        }
+    }
+
+    document.querySelector<HTMLButtonElement>('#optionsForm button.test').disabled = true
+})
+
+customPromptsList.addEventListener('input', () => {
+    document.querySelector<HTMLButtonElement>('#optionsForm button.test').disabled = true
 })
 // <-- capture all changes in the form fields, disabling the test button
 
@@ -85,6 +128,7 @@ document.querySelector('#optionsForm').addEventListener('submit', async (event) 
         maskPii: document.querySelector<HTMLInputElement>('#maskPii').checked,
         debugMode: document.querySelector<HTMLInputElement>('#debugMode').checked,
         theme: document.querySelector<HTMLInputElement>('#theme').value,
+        customPrompts: getCustomPromptsFromDOM(),
         anthropic: {
             apiKey: document.querySelector<HTMLInputElement>('#anthropicApiKey').value,
             model: document.querySelector<HTMLInputElement>('#anthropicModel').value
@@ -174,6 +218,7 @@ document.addEventListener('DOMContentLoaded', async _ => {
     document.querySelector<HTMLInputElement>('#maskPii').checked = configs.maskPii
     document.querySelector<HTMLInputElement>('#debugMode').checked = configs.debugMode
     document.querySelector<HTMLInputElement>('#theme').value = configs.theme || 'default'
+    loadCustomPromptsInDOM(configs.customPrompts || [])
 
     // Anthropic Claude section -->
     document.querySelector<HTMLInputElement>('#anthropicApiKey').value = configs.anthropic?.apiKey || ''
@@ -289,4 +334,55 @@ function updateDOMBasedOnSelectLlmProvider(selectedValue: string): void {
     // select, ensures the visibility of the correct section (from CSS rules)
     // for configuring the specific AI LLM service provider.
     document.querySelector('body').setAttribute('data-provider', selectedValue)
+}
+
+function appendCustomPromptItem(customPrompt: CustomPrompt = { title: '', prompt: '' }): void {
+    const item = document.createElement('div')
+    item.className = 'custom-prompt-item'
+
+    item.innerHTML = `
+        <div class="form-group">
+            <label>${browser.i18n.getMessage('options.customPrompts.title')}</label>
+            <input type="text" class="custom-prompt-title" maxlength="80" value="${escapeHtml(customPrompt.title)}">
+        </div>
+        <div class="form-group">
+            <label>${browser.i18n.getMessage('options.customPrompts.prompt')}</label>
+            <textarea class="custom-prompt-value" rows="3">${escapeHtml(customPrompt.prompt)}</textarea>
+        </div>
+        <div class="custom-prompt-buttons">
+            <button type="button" class="custom-prompt-up">${browser.i18n.getMessage('options.customPrompts.up')}</button>
+            <button type="button" class="custom-prompt-down">${browser.i18n.getMessage('options.customPrompts.down')}</button>
+            <button type="button" class="custom-prompt-delete">${browser.i18n.getMessage('options.customPrompts.remove')}</button>
+        </div>
+    `
+
+    customPromptsList.appendChild(item)
+}
+
+function loadCustomPromptsInDOM(customPrompts: CustomPrompt[]): void {
+    customPromptsList.innerHTML = ''
+
+    customPrompts.forEach((customPrompt) => {
+        appendCustomPromptItem(customPrompt)
+    })
+}
+
+function getCustomPromptsFromDOM(): CustomPrompt[] {
+    return Array.from(customPromptsList.querySelectorAll('.custom-prompt-item'))
+        .map((item) => {
+            const title = (item.querySelector('.custom-prompt-title') as HTMLInputElement).value.trim()
+            const prompt = (item.querySelector('.custom-prompt-value') as HTMLTextAreaElement).value.trim()
+
+            return { title, prompt }
+        })
+        .filter((customPrompt) => customPrompt.title.length > 0 && customPrompt.prompt.length > 0)
+}
+
+function escapeHtml(value: string): string {
+    return value
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;')
 }

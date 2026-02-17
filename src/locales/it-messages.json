@@ -158,6 +158,9 @@
     "mailCustomPrompt": {
         "message": "Prompt personalizzato"
     },
+    "mailCustomPrompts": {
+        "message": "Prompt personalizzati"
+    },
     "mailExplain": {
         "message": "Spiega"
     },
@@ -380,8 +383,35 @@
     "options.xai.model": {
         "message": "Modello*"
     },
+    "options.customPrompts": {
+        "message": "Prompt personalizzati"
+    },
+    "options.customPrompts.description": {
+        "message": "Aggiungi i tuoi prompt personalizzati, definisci l'ordine e salva. Appariranno nel sottomenu \"Prompt personalizzati\"."
+    },
+    "options.customPrompts.add": {
+        "message": "Aggiungi prompt"
+    },
+    "options.customPrompts.title": {
+        "message": "Titolo"
+    },
+    "options.customPrompts.prompt": {
+        "message": "Prompt"
+    },
+    "options.customPrompts.up": {
+        "message": "Su"
+    },
+    "options.customPrompts.down": {
+        "message": "Giù"
+    },
+    "options.customPrompts.remove": {
+        "message": "Rimuovi"
+    },
     "promptDisplay.placeholder": {
         "message": "Come posso aiutarti?"
+    },
+    "errorCustomPromptNotFound": {
+        "message": "Il prompt personalizzato selezionato non è stato trovato."
     },
     "thinking": {
         "message": "Sto pensando!"

@@ -10,6 +10,10 @@ export interface ConfigType {
     maskPii: boolean
     debugMode: boolean
     theme: string
+    customPrompts?: {
+        title: string
+        prompt: string
+    }[]
 
     anthropic: {
         apiKey: string

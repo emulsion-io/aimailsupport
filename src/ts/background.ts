@@ -5,6 +5,7 @@ import { getConfig, getConfigs, getCurrentMessageContent, getLanguageNameFromCod
 // The array contains references to the menus of any custom languages selected
 // by the user for which a translation is requested.
 let translationMenuItemIds: (number | string)[] = null
+let customPromptMenuItemIds: (number | string)[] = null
 
 // Create the menu entries -->
 const menuIdAnalyzeIntent = messenger.menus.create({
@@ -299,6 +300,7 @@ const menuIdTranslateSeparator = messenger.menus.create({
 
 // Translations into the (optional) target languages selected by the user
 updateMenuWithUserTranslationPreferences()
+updateMenuWithUserCustomPromptPreferences()
 // <-- translate submenu
 
 const menuIdModerate = messenger.menus.create({
@@ -326,6 +328,16 @@ const menuIdCustomPrompt = messenger.menus.create({
         'compose_action_menu',
         'message_display_action_menu'
     ]
+})
+
+const subMenuIdCustomPrompts = messenger.menus.create({
+    id: 'aiSubMenuCustomPrompts',
+    title: browser.i18n.getMessage('mailCustomPrompts'),
+    contexts: [
+        'compose_action_menu',
+        'message_display_action_menu'
+    ],
+    visible: false
 })
 
 // Separator for the message display action menu
@@ -517,6 +529,23 @@ messenger.menus.onClicked.addListener(async (info: messenger.menus.OnClickData) 
             logMessage(`Error while improving the text: ${error.message}`, 'error')
         })
     }
+    else if((info.menuItemId as string).startsWith('aiSavedCustomPrompt_')) {
+        const promptIndex = Number.parseInt((info.menuItemId as string).replace('aiSavedCustomPrompt_', ''), 10)
+        const customPrompts = await getConfig('customPrompts') || []
+        const selectedCustomPrompt = customPrompts[promptIndex]
+
+        if(!selectedCustomPrompt?.prompt) {
+            sendMessageToActiveTab({type: 'showError', content: browser.i18n.getMessage('errorCustomPromptNotFound')})
+            return
+        }
+
+        llmProvider.applyCustomPrompt(selectedCustomPrompt.prompt, textToBeProcessed).then(textProcessed => {
+            sendMessageToActiveTab({type: 'addText', content: textProcessed})
+        }).catch(error => {
+            sendMessageToActiveTab({type: 'showError', content: error.message})
+            logMessage(`Error during saved custom prompt: ${error.message}`, 'error')
+        })
+    }
     // Fallback message case, but only if the menu does not match any values to
     // ignore, e.g., options.
     else if (!['aiOptions'].includes(info.menuItemId as string)) {
@@ -591,6 +620,7 @@ browser.runtime.onMessage.addListener(async (message) => {
     if (message.type === 'optionsChanged') {
         updateMenuVisibility()
         updateMenuWithUserTranslationPreferences()
+        updateMenuWithUserCustomPromptPreferences()
     }
 })
 
@@ -608,6 +638,10 @@ async function updateMenuVisibility(): Promise<void> {
 
     // canApplyCustomPrompt -->
     messenger.menus.update(menuIdCustomPrompt, {
+        enabled: llmProvider.canApplyCustomPrompt()
+    })
+
+    messenger.menus.update(subMenuIdCustomPrompts, {
         enabled: llmProvider.canApplyCustomPrompt()
     })
     // <-- canApplyCustomPrompt
@@ -726,6 +760,46 @@ async function updateMenuWithUserTranslationPreferences(): Promise<void> {
 
                 translationMenuItemIds.push(menuItemId)
             }
+        })
+    }
+}
+
+// Updates the menu based on the user's preferred custom prompts.
+// This function retrieves the user's custom prompts and dynamically
+// updates the submenu options accordingly.
+async function updateMenuWithUserCustomPromptPreferences(): Promise<void> {
+    const customPrompts = await getConfig('customPrompts')
+
+    // Remove old menu items to keep consistency after options update.
+    customPromptMenuItemIds?.forEach((menuItemId: (number | string)) => {
+        messenger.menus.remove(menuItemId)
+    })
+
+    customPromptMenuItemIds = []
+
+    messenger.menus.update(subMenuIdCustomPrompts, {
+        visible: false
+    })
+
+    if(customPrompts?.length > 0) {
+        messenger.menus.update(subMenuIdCustomPrompts, {
+            visible: true
+        })
+
+        customPrompts.forEach((customPrompt: { title: string }, index: number) => {
+            const menuId = `aiSavedCustomPrompt_${index}`
+
+            const menuItemId = messenger.menus.create({
+                id: menuId,
+                title: customPrompt.title,
+                parentId: subMenuIdCustomPrompts,
+                contexts: [
+                    'compose_action_menu',
+                    'message_display_action_menu'
+                ]
+            })
+
+            customPromptMenuItemIds.push(menuItemId)
         })
     }
 }

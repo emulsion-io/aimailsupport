@@ -84,6 +84,21 @@
                 </select>
             </div>
 
+            <fieldset id="customPrompts" class="light">
+                <legend data-l10n-ref="options.customPrompts">&nbsp;</legend>
+
+                <div id="customPromptsList"></div>
+
+                <div class="form-group custom-prompts-actions">
+                    <label>&nbsp;</label>
+                    <button type="button" id="addCustomPrompt" data-l10n-ref="options.customPrompts.add">&nbsp;</button>
+                </div>
+
+                <div class="form-group">
+                    <div class="description" data-l10n-ref="options.customPrompts.description"></div>
+                </div>
+            </fieldset>
+
             <!-- Anthropic Claude section -->
             <include src="partials/options-anthropic-claude.html"></include><!-- /Anthropic Claude section -->
 
