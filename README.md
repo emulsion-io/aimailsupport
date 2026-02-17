@@ -207,6 +207,10 @@ Images:
 
 * Robots logo icons in `docs/bot-icon-*` were created by [Smashicons - Freepik](https://www.freepik.com/icon/bot_4712106)
 
+CSS effects:
+
+* Loader [Andrew Manzyk](https://uiverse.io/andrew-manzyk/young-walrus-64)
+
 ---
 
 All trademarks mentioned are the property of their respective owners.
