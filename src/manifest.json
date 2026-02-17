@@ -1,14 +1,14 @@
 {
     "manifest_version": 2,
-    "name": "AI Mail Support",
+    "name": "AI Mail Extended",
     "description": "__MSG_addonDescription__",
-    "version": "1.0",
-    "author": "Yellow Sakura",
-    "homepage_url": "https://www.yellowsakura.com",
-    "default_locale": "en",
+    "version": "1.5",
+    "author": "Fabrice Simonet",
+    "homepage_url": "https://emulsionl.io",
+    "default_locale": "fr",
     "browser_specific_settings": {
         "gecko": {
-            "id": "ai-mail-support@yellowsakura.com",
+            "id": "fabrice@emulsionl.io",
             "strict_min_version": "128.0"
         }
     },
