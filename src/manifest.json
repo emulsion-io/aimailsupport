@@ -25,9 +25,9 @@
         "https://api.x.ai/"
     ],
     "icons": {
-        "64": "images/bot-icon-color-64.webp",
-        "32": "images/bot-icon-color-32.webp",
-        "16": "images/bot-icon-color-16.webp"
+        "64": "images/icon-color-64.png",
+        "32": "images/icon-color-32.png",
+        "16": "images/icon-color-16.png"
     },
     "background": {
         "scripts": ["background.js"],
@@ -37,18 +37,18 @@
         "default_title": "__MSG_menuAiSupport__",
         "theme_icons": [
             {
-                "dark": "images/bot-icon-light-64.webp",
-                "light": "images/bot-icon-dark-64.webp",
+                "dark": "images/icon-light-64.png",
+                "light": "images/icon-dark-64.png",
                 "size": 64
             },
             {
-                "dark": "images/bot-icon-light-32.webp",
-                "light": "images/bot-icon-dark-32.webp",
+                "dark": "images/icon-light-32.png",
+                "light": "images/icon-dark-32.png",
                 "size": 32
             },
             {
-                "dark": "images/bot-icon-light-16.webp",
-                "light": "images/bot-icon-dark-16.webp",
+                "dark": "images/icon-light-16.png",
+                "light": "images/icon-dark-16.png",
                 "size": 16
             }
         ],
@@ -58,18 +58,18 @@
         "default_title": "__MSG_menuAiSupport__",
         "theme_icons": [
             {
-                "dark": "images/bot-icon-light-64.webp",
-                "light": "images/bot-icon-dark-64.webp",
+                "dark": "images/icon-light-64.png",
+                "light": "images/icon-dark-64.png",
                 "size": 64
             },
             {
-                "dark": "images/bot-icon-light-32.webp",
-                "light": "images/bot-icon-dark-32.webp",
+                "dark": "images/icon-light-32.png",
+                "light": "images/icon-dark-32.png",
                 "size": 32
             },
             {
-                "dark": "images/bot-icon-light-16.webp",
-                "light": "images/bot-icon-dark-16.webp",
+                "dark": "images/icon-light-16.png",
+                "light": "images/icon-dark-16.png",
                 "size": 16
             }
         ],
@@ -81,6 +81,6 @@
         "browser_style": false
     },
     "web_accessible_resources": [
-        "images/bot-icon-color-64.webp"
+        "images/icon-color-64.png"
     ]
 }

@@ -4,7 +4,7 @@
 [![TypeScript](https://shields.io/badge/TypeScript-3178C6?logo=TypeScript&logoColor=FFF&style=flat-square)](https://www.typescriptlang.org)
 [![Thunderbird](https://img.shields.io/badge/Thunderbird-147ee1?logo=thunderbird&logoColor=white&style=flat-square)](https://www.thunderbird.net)
 
-<img align="left" width="100px" src="docs/bot-icon-color-512.webp">
+<img align="left" width="100px" src="docs/icon.png" alt="AI Mail Extended for Thunderbird logo">
 
 Thunderbird add-on designed to enhance both professional and personal email management.  
 This add-on integrates a range of AI (LLM) features to streamline your inbox experience.
@@ -106,6 +106,34 @@ To compile a development version of the add-on and install it in Thunderbird via
 ```console
 $ npm run build
 ```
+
+### Icons
+
+The add-on icon source file is:
+
+```text
+docs/icon.png
+```
+
+Icon assets used by the manifest are generated automatically in:
+
+```text
+ai-mail-support/images/
+```
+
+You can regenerate icons manually with:
+
+```console
+$ npm run build:icons
+```
+
+This command generates the required sizes and variants used in `src/manifest.json`:
+
+- `icon-color-{16,32,64}.png`
+- `icon-light-{16,32,64}.png`
+- `icon-dark-{16,32,64}.png`
+
+Note: `npm run build` already runs `npm run build:icons` before building the add-on.
 
 To generate a file named ai-mail-support.xpi in the project's root folder, as a package ready for installation as an add-on in Thunderbird, use the following command:
 
