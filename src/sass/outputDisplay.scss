@@ -223,6 +223,10 @@
         display: flex;
     }
 
+    &.text-content #amsContent {
+        white-space: pre-line;
+    }
+
     #actionsContainer {
         align-items: center;
         display: none;

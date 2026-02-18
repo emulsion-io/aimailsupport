@@ -94,8 +94,15 @@ function addText(newContent: string) {
     getInnerResponse().classList.add('text-content')
 
     // Any Markdown present is converted to plain text
-    const rawText = removeMarkdown(newContent)
+    const rawText = normalizeDisplayedText(removeMarkdown(newContent))
     getInnerResponse().querySelector('#amsContent').textContent = rawText
+}
+
+function normalizeDisplayedText(content: string): string {
+    return (content || '')
+        .replace(/\r\n?/g, '\n')
+        .replace(/\n{2,}/g, '\n')
+        .trim()
 }
 
 function addTagsSummary(content: { intro?: string; tags?: { label?: string; color?: string }[] }) {
@@ -392,7 +399,7 @@ function copyToEmailTop(): void {
 }
 
 function insertTextAtCursor(contentToInsert: string): void {
-    const cleanedContent = (contentToInsert || '').trim()
+    const cleanedContent = normalizeDisplayedText(contentToInsert)
 
     if (!cleanedContent) {
         return
@@ -435,7 +442,7 @@ function insertTextAtCursor(contentToInsert: string): void {
 }
 
 function insertTextBelowSelection(contentToInsert: string): void {
-    const cleanedContent = (contentToInsert || '').trim()
+    const cleanedContent = normalizeDisplayedText(contentToInsert)
 
     if (!cleanedContent) {
         return

@@ -2,7 +2,7 @@
     "manifest_version": 2,
     "name": "AI Mail Extended",
     "description": "__MSG_addonDescription__",
-    "version": "1.5",
+    "version": "1.6",
     "author": "Fabrice Simonet",
     "homepage_url": "https://emulsion.io",
     "default_locale": "fr",
