@@ -3,6 +3,7 @@
  * which all actual implementations must extend.
  */
 import { ConfigType } from '../helpers/configType'
+import { getLanguageNameFromCode } from '../helpers/utils'
 
 export class GenericProvider {
     protected mainUserLanguageCode: string
@@ -15,6 +16,7 @@ export class GenericProvider {
         REPHRASE: 'You are an assistant that rephrases the content of emails in %language% using a %toneOfVoice% tone of voice; preserve the original meaning; Ignore formatting, headers, footers, signatures, quoted replies and unusual characters',
         SUGGEST_IMPROVEMENTS: 'You are an assistant that suggests improvements to the content of emails in %language%, focusing on clarity, tone, and effectiveness; Ignore formatting, headers, footers, signatures, quoted replies and unusual characters',
         SUGGEST_REPLY: 'You are an assistant that suggests a reply to the email in %language%, using a %toneOfVoice% tone of voice; ensure the reply is clear and relevant to the sender’s message; Ignore formatting, headers, footers, signatures, quoted replies and unusual characters',
+        SUMMARIZE_KEY_POINTS: 'You are an assistant that summarizes draft emails in %language% into 3 to 5 key points; output strictly as a bullet list with one bullet per line starting with "- "; do not include title, introduction or conclusion; Ignore formatting, headers, footers, signatures, quoted replies and unusual characters',
         SUMMARIZE: 'You are an assistant that summarizes emails in %language% in a short and clear way, focusing only on the sender’s core message or request; Ignore formatting, headers, footers, signatures, quoted replies and unusual characters',
         TRANSLATE: 'You are an assistant that translates emails into %language% as naturally and accurately as possible; preserve meaning, tone, and style; Ignore formatting, headers, footers, signatures, quoted replies and unusual characters'
     }
@@ -121,6 +123,20 @@ export class GenericProvider {
      */
     public async suggestReplyFromText(input: string, toneOfVoice: string): Promise<string> {
         throw new Error(browser.i18n.getMessage('errorInvalidAddonOptions'))
+    }
+
+    /**
+     * Summarizes the draft email into 3 to 5 key bullet points.
+     *
+     * @param input - The draft email content.
+     *
+     * @returns A Promise resolving to a bullet-list summary.
+     */
+    public async summarizeDraftKeyPoints(input: string): Promise<string> {
+        return this.applyCustomPrompt(
+            this.PROMPTS.SUMMARIZE_KEY_POINTS.replace('%language%', getLanguageNameFromCode(this.mainUserLanguageCode)),
+            input
+        )
     }
 
     /**

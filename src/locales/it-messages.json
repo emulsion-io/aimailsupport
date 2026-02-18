@@ -152,6 +152,9 @@
     "mailSuggestReply.standard": {
         "message": "Standard"
     },
+    "mailSummarizeKeyPoints": {
+        "message": "Riassumi i punti chiave"
+    },
     "mailAnalyzeIntent": {
         "message": "Analizza intento"
     },

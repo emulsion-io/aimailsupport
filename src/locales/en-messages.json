@@ -199,6 +199,10 @@
         "message": "Standard",
         "description": "This option suggests a reply to an email ensuring a standard tone of voice."
     },
+    "mailSummarizeKeyPoints": {
+        "message": "Summarize key points",
+        "description": "This option summarizes the drafted email into 3 to 5 key points and inserts them at the top of the draft."
+    },
     "mailAnalyzeIntent": {
         "message": "Analyze intent",
         "description": "Menu option to analyze the intent of an email being composed."

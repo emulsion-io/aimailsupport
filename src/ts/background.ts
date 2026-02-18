@@ -125,6 +125,24 @@ const menuIdRephrasePolite = messenger.menus.create({
         'selection'
     ]
 })
+
+const menuIdRephraseSeparator = messenger.menus.create({
+    id: 'aiRephraseSeparator',
+    type: 'separator',
+    parentId: subMenuIdRephrase,
+    contexts: [
+        'selection'
+    ]
+})
+
+const menuIdRephraseSummarizeKeyPoints = messenger.menus.create({
+    id: 'aiRephraseSummarizeKeyPoints',
+    title: browser.i18n.getMessage('mailSummarizeKeyPoints'),
+    parentId: subMenuIdRephrase,
+    contexts: [
+        'selection'
+    ]
+})
 // <-- rephrase submenu
 
 // Suggest reply submenu -->
@@ -211,6 +229,24 @@ const menuIdSuggestReplyShortened = messenger.menus.create({
 const menuIdSuggestReplyPolite = messenger.menus.create({
     id: 'aiSuggestReplyPolite',
     title: browser.i18n.getMessage('mailSuggestReply.polite'),
+    parentId: subMenuIdSuggestReply,
+    contexts: [
+        'compose_action_menu'
+    ]
+})
+
+const menuIdSuggestReplySeparator = messenger.menus.create({
+    id: 'aiSuggestReplySeparator',
+    type: 'separator',
+    parentId: subMenuIdSuggestReply,
+    contexts: [
+        'compose_action_menu'
+    ]
+})
+
+const menuIdSummarizeKeyPoints = messenger.menus.create({
+    id: 'aiSummarizeKeyPoints',
+    title: browser.i18n.getMessage('mailSummarizeKeyPoints'),
     parentId: subMenuIdSuggestReply,
     contexts: [
         'compose_action_menu'
@@ -438,6 +474,15 @@ messenger.menus.onClicked.addListener(async (info: messenger.menus.OnClickData) 
             logMessage(`Error during rephrasing: ${error.message}`, 'error')
         })
     }
+    else if(info.menuItemId == menuIdRephraseSummarizeKeyPoints) {
+        llmProvider.summarizeDraftKeyPoints(textToBeProcessed).then((summaryAsBullets: string) => {
+            sendMessageToActiveTab({ type: 'insertTextBelowSelection', content: summaryAsBullets })
+            sendMessageToActiveTab({ type: 'hideOutput' })
+        }).catch(error => {
+            sendMessageToActiveTab({type: 'showError', content: error.message})
+            logMessage(`Error during key points summarization from selection: ${error.message}`, 'error')
+        })
+    }
     else if([menuIdSuggestReplyStandard, menuIdSuggestReplyFluid, menuIdSuggestReplyCreative, menuIdSuggestReplySimple,
             menuIdSuggestReplyFormal, menuIdSuggestReplyAcademic, menuIdSuggestReplyExpanded, menuIdSuggestReplyShortened,
             menuIdSuggestReplyPolite].includes(info.menuItemId)) {
@@ -453,6 +498,15 @@ messenger.menus.onClicked.addListener(async (info: messenger.menus.OnClickData) 
         }).catch(error => {
             sendMessageToActiveTab({type: 'showError', content: error.message})
             logMessage(`Error during reply generation: ${error.message}`, 'error')
+        })
+    }
+    else if(info.menuItemId == menuIdSummarizeKeyPoints) {
+        llmProvider.summarizeDraftKeyPoints(textToBeProcessed).then((summaryAsBullets: string) => {
+            sendMessageToActiveTab({ type: 'insertTextAtCursor', content: summaryAsBullets })
+            sendMessageToActiveTab({ type: 'hideOutput' })
+        }).catch(error => {
+            sendMessageToActiveTab({type: 'showError', content: error.message})
+            logMessage(`Error during key points summarization: ${error.message}`, 'error')
         })
     }
     else if(info.menuItemId == menuIdSummarizeAndText2Speech) {

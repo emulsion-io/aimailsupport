@@ -20,6 +20,14 @@ browser.runtime.onMessage.addListener(async (message: any) => {
                 addText(message.content)
                 break
 
+            case 'insertTextAtCursor':
+                insertTextAtCursor(message.content)
+                break
+
+            case 'insertTextBelowSelection':
+                insertTextBelowSelection(message.content)
+                break
+
             case 'setComposeMode':
                 const actionsContainer = getInnerResponse().querySelector('#actionsContainer')
                 if (message.isCompose) {
@@ -31,6 +39,10 @@ browser.runtime.onMessage.addListener(async (message: any) => {
 
             case 'showError':
                 showError(message.content)
+                break
+
+            case 'hideOutput':
+                clearOutputDisplay(true)
                 break
 
             case 'thinking':
@@ -318,4 +330,124 @@ function copyToEmailTop(): void {
             }
         }
     }
+}
+
+function insertTextAtCursor(contentToInsert: string): void {
+    const cleanedContent = (contentToInsert || '').trim()
+
+    if (!cleanedContent) {
+        return
+    }
+
+    try {
+        const emailBody: HTMLElement | null = document.querySelector('body')
+
+        if (!emailBody) {
+            return
+        }
+
+        const aiContent = createInsertedContentNode(cleanedContent)
+
+        const selection = globalThis.getSelection()
+        const canInsertAtCursor = selection
+            && selection.rangeCount > 0
+            && emailBody.contains(selection.getRangeAt(0).commonAncestorContainer)
+
+        if (canInsertAtCursor) {
+            const range = selection.getRangeAt(0)
+            range.deleteContents()
+            range.insertNode(aiContent)
+
+            range.setStartAfter(aiContent)
+            range.collapse(true)
+            selection.removeAllRanges()
+            selection.addRange(range)
+        }
+        else {
+            emailBody.appendChild(aiContent)
+        }
+    } catch (error) {
+        if (error instanceof Error) {
+            logMessage(`Error inserting text at cursor: ${error.message}`, 'error')
+        } else {
+            logMessage('Unknown error inserting text at cursor', 'error')
+        }
+    }
+}
+
+function insertTextBelowSelection(contentToInsert: string): void {
+    const cleanedContent = (contentToInsert || '').trim()
+
+    if (!cleanedContent) {
+        return
+    }
+
+    try {
+        const emailBody: HTMLElement | null = document.querySelector('body')
+
+        if (!emailBody) {
+            return
+        }
+
+        const aiContent = createInsertedContentNode(cleanedContent)
+        const selection = globalThis.getSelection()
+        const canInsertBelowSelection = selection
+            && selection.rangeCount > 0
+            && emailBody.contains(selection.getRangeAt(0).commonAncestorContainer)
+
+        if (canInsertBelowSelection) {
+            const range = selection.getRangeAt(0).cloneRange()
+            range.collapse(false)
+
+            const wrapper = document.createElement('div')
+            wrapper.appendChild(document.createElement('br'))
+            wrapper.appendChild(aiContent)
+
+            range.insertNode(wrapper)
+
+            range.setStartAfter(wrapper)
+            range.collapse(true)
+            selection.removeAllRanges()
+            selection.addRange(range)
+        }
+        else {
+            insertTextAtCursor(cleanedContent)
+        }
+    } catch (error) {
+        if (error instanceof Error) {
+            logMessage(`Error inserting text below selection: ${error.message}`, 'error')
+        } else {
+            logMessage('Unknown error inserting text below selection', 'error')
+        }
+    }
+}
+
+function createInsertedContentNode(cleanedContent: string): HTMLDivElement {
+    const lines = cleanedContent
+        .split('\n')
+        .map(line => line.trim())
+        .filter(line => line.length > 0)
+
+    const bullets = lines
+        .map(line => line.replace(/^[-*•]\s+/, '').trim())
+        .filter(line => line.length > 0)
+
+    const aiContent = document.createElement('div')
+
+    if (bullets.length > 0) {
+        const list = document.createElement('ul')
+
+        bullets.forEach((bullet) => {
+            const item = document.createElement('li')
+            item.textContent = bullet
+            list.appendChild(item)
+        })
+
+        aiContent.appendChild(list)
+    }
+    else {
+        aiContent.textContent = cleanedContent
+    }
+
+    return aiContent
 }

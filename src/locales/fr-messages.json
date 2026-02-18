@@ -199,6 +199,10 @@
         "message": "Standard",
         "description": "Cette option suggère une réponse à un e-mail en assurant une tonalité de voix standard."
     },
+    "mailSummarizeKeyPoints": {
+        "message": "Résume les points clés",
+        "description": "Cette option résume l'e-mail en cours de rédaction en 3 à 5 points clés ajoutés en haut du brouillon."
+    },
     "mailAnalyzeIntent": {
         "message": "Analyser l'intention",
         "description": "Option de menu pour analyser l'intention d'un e-mail en cours de rédaction."
