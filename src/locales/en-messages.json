@@ -250,7 +250,7 @@
         }
     },
     "menuAiSupport": {
-        "message": "AI support",
+        "message": "AI",
         "description": "Menu with all AI support options."
     },
     "options": {
