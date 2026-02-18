@@ -7,8 +7,9 @@
         <link rel="stylesheet" href="../sass/options.scss">
     </head>
 
-    <body>
-        <form id="optionsForm">
+    <body class="options-page">
+        <main class="options-layout">
+            <form id="optionsForm">
             <div id="testResult">
                 <span class="close-icon">&times;</span>
                 <span class="message"></span>
@@ -28,7 +29,6 @@
                 <label for="translationLanguageCodes" data-l10n-ref="options.translationLanguageCodes">&nbsp;</label>
 
                 <multiple-language-selector id="translationLanguageCodes"></multiple-language-selector>
-
                 <div class="description" data-l10n-ref="options.translationLanguageCodes.description"></div>
             </div>
 
@@ -130,7 +130,8 @@
                 <button type="button" class="test" data-l10n-ref="options.testButton" disabled>&nbsp;</button>
                 <button type="submit" class="save" data-l10n-ref="options.saveButton">&nbsp;</button>
             </div>
-        </form>
+            </form>
+        </main>
 
         <!-- Components: -->
         <script type="module" src="../ts/components/LanguageSelector.ts"></script>

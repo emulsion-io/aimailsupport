@@ -2,9 +2,90 @@
 
 $options-labels-width: 150px;
 
+:root {
+    --options-bg: #f3f6fb;
+    --options-card-bg: #ffffff;
+    --options-card-border: #dfe6f4;
+    --options-text: #1f2a44;
+    --options-muted: #5c6d8b;
+    --options-input-bg: #f9fbff;
+    --options-input-border: #c9d5ed;
+    --options-focus: #4d8dff;
+    --options-focus-ring: rgba(77, 141, 255, 0.24);
+    --options-shadow: 0 16px 35px rgba(22, 34, 59, 0.12);
+    --options-button-primary: #2f7eff;
+    --options-button-primary-hover: #1e6df0;
+    --options-button-secondary: #ecf2ff;
+    --options-button-secondary-hover: #dbe8ff;
+    --options-custom-item-bg: #f9fbff;
+}
+
+@media (prefers-color-scheme: dark) {
+    body:not([data-theme='dark']) {
+        --options-bg: #0f1626;
+        --options-card-bg: #151f33;
+        --options-card-border: #24314f;
+        --options-text: #e6ecff;
+        --options-muted: #9fb1d8;
+        --options-input-bg: #101a2d;
+        --options-input-border: #334467;
+        --options-focus: #5ea2ff;
+        --options-focus-ring: rgba(94, 162, 255, 0.28);
+        --options-shadow: 0 18px 34px rgba(2, 8, 22, 0.58);
+        --options-button-primary: #4e96ff;
+        --options-button-primary-hover: #65a4ff;
+        --options-button-secondary: #1a2742;
+        --options-button-secondary-hover: #22345a;
+        --options-custom-item-bg: #111d31;
+    }
+}
+
+body[data-theme='dark'] {
+    --options-bg: #0f1626;
+    --options-card-bg: #151f33;
+    --options-card-border: #24314f;
+    --options-text: #e6ecff;
+    --options-muted: #9fb1d8;
+    --options-input-bg: #101a2d;
+    --options-input-border: #334467;
+    --options-focus: #5ea2ff;
+    --options-focus-ring: rgba(94, 162, 255, 0.28);
+    --options-shadow: 0 18px 34px rgba(2, 8, 22, 0.58);
+    --options-button-primary: #4e96ff;
+    --options-button-primary-hover: #65a4ff;
+    --options-button-secondary: #1a2742;
+    --options-button-secondary-hover: #22345a;
+    --options-custom-item-bg: #111d31;
+}
+
+body.options-page {
+    background: radial-gradient(circle at top, #edf3ff 0%, var(--options-bg) 42%);
+    color: var(--options-text);
+    margin: 0;
+    min-height: 100vh;
+    transition: background-color .3s ease, color .3s ease;
+}
+
+body.options-page[data-theme='dark'] {
+    background: radial-gradient(circle at top, #14203a 0%, var(--options-bg) 42%);
+}
+
+.options-layout {
+    margin: 0 auto;
+    max-width: 1080px;
+    padding: 18px;
+}
+
 #optionsForm {
-    margin-top: 15px;
+    backdrop-filter: blur(6px);
+    background-color: color-mix(in srgb, var(--options-card-bg) 95%, transparent);
+    border: 1px solid var(--options-card-border);
+    border-radius: 14px;
+    box-shadow: var(--options-shadow);
+    margin-top: 4px;
+    padding: 20px;
     position: relative;
+    transition: background-color .3s ease, border-color .3s ease, box-shadow .3s ease;
 
     &.submit-attempt input:invalid,
     &.submit-attempt select:invalid {
@@ -70,10 +151,11 @@ $options-labels-width: 150px;
     #owlForExchangeBug {
         @include alert-danger;
 
+        border: 1px solid color-mix(in srgb, #f5c2c7 65%, transparent);
         border-radius: 5px;
         display: none;
         font-size: 13px;
-        margin-bottom: 10px;
+        margin-bottom: 14px;
         padding: 10px;
 
         &.show {
@@ -82,15 +164,18 @@ $options-labels-width: 150px;
     }
 
     .form-group {
+        align-items: center;
         display: flex;
         flex-wrap: wrap;
-        margin-bottom: 10px;
+        margin-bottom: 12px;
         position: relative;
 
         label {
+            color: var(--options-text);
             display: inline-block;
             flex-shrink: 0;
-            font-size: 15px;
+            font-size: 14px;
+            font-weight: 600;
             padding-right: 5px;
             text-align: right;
             vertical-align: middle;
@@ -105,10 +190,32 @@ $options-labels-width: 150px;
         input,
         select {
             align-self: center;
+            background-color: var(--options-input-bg);
+            border: 1px solid var(--options-input-border);
+            border-radius: 8px;
+            color: var(--options-text);
             flex-grow: 1;
+            min-height: 36px;
+            padding: 0 10px;
+            transition: border-color .2s ease, box-shadow .2s ease, background-color .2s ease;
+
+            &:focus {
+                border-color: var(--options-focus);
+                box-shadow: 0 0 0 3px var(--options-focus-ring);
+                outline: none;
+            }
 
             &[type="checkbox"] {
+                accent-color: var(--options-button-primary);
+                min-height: auto;
+                padding: 0;
                 flex-grow: 0;
+                height: 18px;
+                width: 18px;
+            }
+
+            &[type="range"] {
+                padding: 0;
             }
 
             & + button {
@@ -143,7 +250,9 @@ $options-labels-width: 150px;
         .description {
             flex-basis: 100%;
             font-size: 11px;
-            margin-top: 5px;
+            color: var(--options-muted);
+            line-height: 1.5;
+            margin-top: 4px;
             padding-left: calc($options-labels-width + 10px);
             text-align: justify;
 
@@ -217,31 +326,82 @@ $options-labels-width: 150px;
 
         &.buttons {
             justify-content: center;
+            margin-top: 22px;
 
             button.test.testing {
                 animation: zoomPulse 1s infinite;
             }
 
             button.save {
-                margin-left: 80px;
+                margin-left: 12px;
+            }
+
+            button {
+                border: none;
+                border-radius: 9px;
+                cursor: pointer;
+                font-size: 14px;
+                font-weight: 600;
+                min-width: 130px;
+                padding: 10px 16px;
+                transition: transform .15s ease, background-color .2s ease, box-shadow .2s ease;
+
+                &:active {
+                    transform: translateY(1px);
+                }
+
+                &.test {
+                    background: var(--options-button-secondary);
+                    color: var(--options-text);
+
+                    &:hover:not(:disabled) {
+                        background: var(--options-button-secondary-hover);
+                    }
+                }
+
+                &.save {
+                    background: var(--options-button-primary);
+                    color: #fff;
+
+                    &:hover {
+                        background: var(--options-button-primary-hover);
+                    }
+                }
+
+                &:disabled {
+                    cursor: not-allowed;
+                    opacity: .6;
+                }
             }
         }
     }
 
     fieldset {
+        background-color: color-mix(in srgb, var(--options-card-bg) 90%, transparent);
+        border: 1px solid var(--options-card-border);
+        border-radius: 10px;
         display: none;
-        margin-bottom: 15px;
+        margin-bottom: 16px;
+        padding: 10px 10px 4px;
+
+        legend {
+            color: var(--options-text);
+            font-size: 14px;
+            font-weight: 700;
+            padding: 0 8px;
+        }
 
         // The visibility of a nested fieldset depends on the visibility of the parent
         & fieldset {
             display: block;
+            margin-top: 8px;
         }
 
         // "Lightweight" version of the fieldset, where only the top border is visible
         &.light {
-            border-width: 2px 0 0 0;
-            margin: 0;
-            padding: 10px 0 0 0;
+            border-width: 1px;
+            margin: 0 0 16px;
+            padding: 8px 8px 0;
         }
 
         body[data-provider='anthropic'] &#anthropic,
@@ -262,8 +422,9 @@ $options-labels-width: 150px;
 
         #customPromptsList {
             .custom-prompt-item {
-                border: 1px solid #d0d0d0;
-                border-radius: 6px;
+                background: var(--options-custom-item-bg);
+                border: 1px solid var(--options-input-border);
+                border-radius: 8px;
                 margin-bottom: 10px;
                 padding: 10px;
 
@@ -272,22 +433,113 @@ $options-labels-width: 150px;
                 }
 
                 textarea {
+                    background-color: var(--options-input-bg);
+                    border: 1px solid var(--options-input-border);
+                    border-radius: 8px;
+                    color: var(--options-text);
+                    font-family: inherit;
                     min-height: 70px;
+                    padding: 8px;
                     resize: vertical;
+
+                    &:focus {
+                        border-color: var(--options-focus);
+                        box-shadow: 0 0 0 3px var(--options-focus-ring);
+                        outline: none;
+                    }
+                }
+
+                .custom-prompt-textarea-group {
+                    display: block;
+
+                    label {
+                        display: block;
+                        margin-bottom: 6px;
+                        text-align: left;
+                        width: 100%;
+                    }
+
+                    .custom-prompt-value {
+                        display: block;
+                        min-height: 110px;
+                        width: 100%;
+                    }
                 }
 
                 .custom-prompt-buttons {
                     display: flex;
                     gap: 8px;
                     justify-content: flex-end;
-                    padding-left: calc($options-labels-width + 10px);
+                    padding-left: 0;
+
+                    button {
+                        background: var(--options-button-secondary);
+                        border: 1px solid var(--options-input-border);
+                        border-radius: 8px;
+                        color: var(--options-text);
+                        cursor: pointer;
+                        padding: 7px 10px;
+
+                        &:hover {
+                            background: var(--options-button-secondary-hover);
+                        }
+                    }
                 }
             }
         }
 
         .custom-prompts-actions {
             button {
+                background: var(--options-button-secondary);
+                border: 1px solid var(--options-input-border);
+                border-radius: 8px;
+                color: var(--options-text);
+                cursor: pointer;
                 margin-left: 0;
+                min-height: 36px;
+                padding: 8px 12px;
+
+                &:hover {
+                    background: var(--options-button-secondary-hover);
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 860px) {
+    #optionsForm {
+        padding: 16px;
+
+        .form-group {
+            label {
+                margin-bottom: 3px;
+                text-align: left;
+                width: 100%;
+            }
+
+            .description {
+                padding-left: 0;
+            }
+
+            .custom-prompt-buttons {
+                padding-left: 0;
+            }
+        }
+
+        .form-group.buttons {
+            button {
+                min-width: 118px;
+            }
+        }
+
+        #customPrompts {
+            #customPromptsList {
+                .custom-prompt-item {
+                    .custom-prompt-buttons {
+                        padding-left: 0;
+                    }
+                }
             }
         }
     }

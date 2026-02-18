@@ -10,6 +10,15 @@ type CustomPrompt = {
 // Internationalization message management
 localizeNodes()
 
+function applyOptionsTheme(themeValue: string): void {
+    if (themeValue === 'dark') {
+        document.body.setAttribute('data-theme', 'dark')
+    }
+    else {
+        document.body.removeAttribute('data-theme')
+    }
+}
+
 // Handle AI LLM provider selection event, properly managing what to display
 // in the DOM.
 document.querySelector('#llmProvider').addEventListener('change', (event) => {
@@ -39,6 +48,10 @@ document.querySelectorAll('#optionsForm select').forEach((node) => {
     node.addEventListener('change', () => {
         document.querySelector<HTMLButtonElement>('#optionsForm button.test').disabled = true
     })
+})
+
+document.querySelector('#theme').addEventListener('change', (event) => {
+    applyOptionsTheme((event.target as HTMLSelectElement).value)
 })
 
 const customPromptsList = document.querySelector<HTMLDivElement>('#customPromptsList')
@@ -218,6 +231,7 @@ document.addEventListener('DOMContentLoaded', async _ => {
     document.querySelector<HTMLInputElement>('#maskPii').checked = configs.maskPii
     document.querySelector<HTMLInputElement>('#debugMode').checked = configs.debugMode
     document.querySelector<HTMLInputElement>('#theme').value = configs.theme || 'default'
+    applyOptionsTheme(configs.theme || 'default')
     loadCustomPromptsInDOM(configs.customPrompts || [])
 
     // Anthropic Claude section -->
@@ -345,7 +359,7 @@ function appendCustomPromptItem(customPrompt: CustomPrompt = { title: '', prompt
             <label>${browser.i18n.getMessage('options.customPrompts.title')}</label>
             <input type="text" class="custom-prompt-title" maxlength="80" value="${escapeHtml(customPrompt.title)}">
         </div>
-        <div class="form-group">
+        <div class="form-group custom-prompt-textarea-group">
             <label>${browser.i18n.getMessage('options.customPrompts.prompt')}</label>
             <textarea class="custom-prompt-value" rows="3">${escapeHtml(customPrompt.prompt)}</textarea>
         </div>

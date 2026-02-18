@@ -3,100 +3,106 @@
  * interface.
  */
 class MultipleLanguageSelector extends HTMLElement {
-    private readonly sourceSelect: LanguageSelector
+    private readonly sourceSelect: HTMLSelectElement
     private readonly targetSelect: HTMLSelectElement
-    private readonly moveRightButton: HTMLButtonElement
-    private readonly moveLeftButton: HTMLButtonElement
 
     constructor() {
         super()
-        const shadowRoot = this.attachShadow({ mode: 'open' })
 
-        const style = document.createElement('style')
-        style.textContent = `
-            .container {
-                align-items: center;
-                display: flex;
+        this.style.display = 'block'
+        this.style.flex = '1 1 auto'
+        this.style.minWidth = '0'
 
-                select {
-                    flex: 1;
-                    height: 120px;
-                }
-
-                .button-container {
-                    display: flex;
-                    flex-direction: column;
-
-                    button {
-                        padding: 0 8px;
-                        margin: 5px;
-                    }
-                }
-            }
-        `
-
-        // Main container
         const container = document.createElement('div')
-        container.className = 'container'
+        container.style.display = 'flex'
+        container.style.alignItems = 'center'
+        container.style.gap = '8px'
+        container.style.width = '100%'
 
-        // Source select (available languages)
-        this.sourceSelect = document.createElement('select', { is: 'language-selector' }) as LanguageSelector
-        this.sourceSelect.multiple = true
+        this.sourceSelect = this.createListSelect()
 
         const buttonContainer = document.createElement('div')
-        buttonContainer.className = 'button-container'
+        buttonContainer.style.display = 'flex'
+        buttonContainer.style.flexDirection = 'column'
+        buttonContainer.style.flex = '0 0 auto'
+        buttonContainer.style.gap = '6px'
 
-        this.moveRightButton = document.createElement('button')
-        this.moveRightButton.textContent = '→'
-        this.moveLeftButton = document.createElement('button')
-        this.moveLeftButton.textContent = '←'
+        const moveRightButton = this.createMoveButton('→', true)
+        const moveLeftButton = this.createMoveButton('←', false)
 
-        buttonContainer.append(this.moveRightButton, this.moveLeftButton)
+        buttonContainer.append(moveRightButton, moveLeftButton)
 
-        // Target select (selected languages)
-        this.targetSelect = document.createElement('select')
-        this.targetSelect.multiple = true
+        this.targetSelect = this.createListSelect()
 
-        // Component assembly
         container.append(this.sourceSelect, buttonContainer, this.targetSelect)
-        shadowRoot.append(style, container)
-
-        // Event handlers
-        this.moveRightButton.addEventListener('click', () => this.moveSelected(true))
-        this.moveLeftButton.addEventListener('click', () => this.moveSelected(false))
-        this.targetSelect.addEventListener('change', () => this.dispatchEvent(new Event('change')))
+        this.append(container)
     }
 
-    /**
-     * Moves selected options between lists.
-     *
-     * @param toTarget - Direction flag, boolean value:
-     *   true = to target list;
-     *   false = to source list.
-     */
+    connectedCallback() {
+        this.syncSourceFromMainSelector()
+
+        if (this.sourceSelect.options.length === 0) {
+            requestAnimationFrame(() => this.syncSourceFromMainSelector())
+        }
+    }
+
+    private createListSelect(): HTMLSelectElement {
+        const select = document.createElement('select')
+        select.multiple = true
+        select.style.flex = '1 1 0'
+        select.style.minWidth = '220px'
+        select.style.width = '100%'
+        select.style.height = '120px'
+
+        select.addEventListener('change', () => this.dispatchEvent(new Event('change')))
+
+        return select
+    }
+
+    private createMoveButton(symbol: string, toTarget: boolean): HTMLButtonElement {
+        const button = document.createElement('button')
+        button.type = 'button'
+        button.textContent = symbol
+        button.style.minHeight = '28px'
+        button.style.padding = '0 8px'
+
+        button.addEventListener('click', (event) => {
+            event.preventDefault()
+            this.moveSelected(toTarget)
+        })
+
+        return button
+    }
+
+    private syncSourceFromMainSelector() {
+        if (this.sourceSelect.options.length > 0) {
+            return
+        }
+
+        const mainLanguageSelector = document.querySelector<HTMLSelectElement>('#mainUserLanguageCode')
+        if (!mainLanguageSelector || mainLanguageSelector.options.length === 0) {
+            return
+        }
+
+        const options = Array.from(mainLanguageSelector.options)
+            .map((option) => option.cloneNode(true) as HTMLOptionElement)
+
+        this.sourceSelect.replaceChildren(...options)
+    }
+
     private moveSelected(toTarget: boolean) {
         const source = toTarget ? this.sourceSelect : this.targetSelect
         const target = toTarget ? this.targetSelect : this.sourceSelect
 
-        Array.from(source.selectedOptions).forEach(option => {
-            source.removeChild(option)
-            target.appendChild(option)
-        })
+        Array.from(source.selectedOptions).forEach(option => target.appendChild(option))
 
-        // Sort target list alphabetically
-        const options = Array.from(target.options)
-
-        const sortedOptions = options.toSorted((a: HTMLOptionElement, b: HTMLOptionElement) => {
-            const textA = a.textContent || ''
-            const textB = b.textContent || ''
-
-            return textA.localeCompare(textB)
-        })
+        const sortedOptions = Array.from(target.options)
+            .sort((a, b) => (a.textContent || '').localeCompare(b.textContent || ''))
 
         target.replaceChildren(...sortedOptions)
+        this.dispatchEvent(new Event('change'))
     }
 
-    // HTMLSelectElement interface proxy
     get value(): string { return this.targetSelect.value }
     set value(v: string) { this.targetSelect.value = v }
 
@@ -106,41 +112,29 @@ class MultipleLanguageSelector extends HTMLElement {
     get options(): HTMLOptionsCollection { return this.targetSelect.options }
     get selectedOptions(): HTMLCollectionOf<HTMLOptionElement> { return this.targetSelect.selectedOptions }
 
-    /**
-     * Returns array of language codes
-     */
     getValues(): string[] {
-        return Array.from(this.targetSelect.options).map(opt => opt.value)
+        return Array.from(this.targetSelect.options).map((option) => option.value)
     }
 
-    /**
-     * Sets values and synchronizes both lists
-     * @param values - Array of language codes (e.g. ['en', 'fr'])
-     */
     setValues(values: string[]) {
-        // Aggregate all options from both lists
+        this.syncSourceFromMainSelector()
+
         const allOptions = [
             ...Array.from(this.sourceSelect.options),
             ...Array.from(this.targetSelect.options)
         ]
 
-        // Filter and sort options for both lists
-        const sortComparator = (a: HTMLOptionElement, b: HTMLOptionElement) =>
-            (a.textContent || '').localeCompare(b.textContent || '')
-
         const sourceOptions = allOptions
-            .filter(option => !values.includes(option.value))
-            .sort(sortComparator)
+            .filter((option) => !values.includes(option.value))
+            .sort((a, b) => (a.textContent || '').localeCompare(b.textContent || ''))
 
         const targetOptions = allOptions
-            .filter(option => values.includes(option.value))
-            .sort(sortComparator)
+            .filter((option) => values.includes(option.value))
+            .sort((a, b) => (a.textContent || '').localeCompare(b.textContent || ''))
 
-        // Rebuild lists with sorted options
         this.sourceSelect.replaceChildren(...sourceOptions)
         this.targetSelect.replaceChildren(...targetOptions)
 
-        // Notify listeners
         this.dispatchEvent(new Event('change'))
     }
 }
