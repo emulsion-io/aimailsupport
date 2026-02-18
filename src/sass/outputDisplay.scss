@@ -171,6 +171,46 @@
                 }
             }
         }
+
+        .auto-tags-summary {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+
+            .auto-tags-intro {
+                margin: 0;
+            }
+
+            .auto-tags-badges {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .auto-tag-badge {
+                align-items: center;
+                background: color-mix(in srgb, var(--bg-color) 65%, var(--text-color) 35%);
+                border: 1px solid var(--border-color);
+                border-radius: 999px;
+                display: inline-flex;
+                gap: 8px;
+                padding: 4px 10px;
+            }
+
+            .auto-tag-dot {
+                border-radius: 50%;
+                box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2);
+                display: inline-block;
+                flex: 0 0 auto;
+                height: 10px;
+                width: 10px;
+            }
+
+            .auto-tag-label {
+                font-weight: 600;
+                line-height: 1;
+            }
+        }
     }
 
     .close-icon {

@@ -14,6 +14,7 @@ export class GenericProvider {
         ANALYZE_INTENT: 'You are an assistant that analyzes the tone and perceived intent of an email and provides the analysis in %language%; describe how the email might come across to the recipient, considering tone, clarity, potential emotional impact, and coherence with the context of the email thread history; Ignore formatting, headers, footers, signatures, quoted replies and unusual characters',
         EXPLAIN: 'You are an assistant that explains the content of emails in %language% in a clear and simple way, preserving the original meaning; avoid unnecessary complexity; Ignore formatting, headers, footers, signatures, quoted replies and unusual characters',
         REPHRASE: 'You are an assistant that rephrases the content of emails in %language% using a %toneOfVoice% tone of voice; preserve the original meaning; Ignore formatting, headers, footers, signatures, quoted replies and unusual characters',
+        SUGGEST_TAGS: 'You are an assistant that suggests Thunderbird tags for an email in %language%; apply this decision policy: (1) extract and prioritize keywords from the email subject first, treating the subject as the highest-priority signal; (2) use the body only as secondary context to refine or confirm subject-driven tags; (3) override a subject-based tag only when the body provides clear contradictory evidence. Choose only from the provided allowed tags and return strictly valid JSON with the format {"tags": ["tagKey1", "tagKey2"]}; return at most 4 tags; do not include markdown, prose, or any extra keys; if no tag applies return {"tags": []}; Ignore formatting, headers, footers, signatures, quoted replies and unusual characters',
         SUGGEST_IMPROVEMENTS: 'You are an assistant that suggests improvements to the content of emails in %language%, focusing on clarity, tone, and effectiveness; Ignore formatting, headers, footers, signatures, quoted replies and unusual characters',
         SUGGEST_REPLY: 'You are an assistant that suggests a reply to the email in %language%, using a %toneOfVoice% tone of voice; ensure the reply is clear and relevant to the sender’s message; Ignore formatting, headers, footers, signatures, quoted replies and unusual characters',
         SUMMARIZE_KEY_POINTS: 'You are an assistant that summarizes draft emails in %language% into 3 to 5 key points; output strictly as a bullet list with one bullet per line starting with "- "; do not include title, introduction or conclusion; Ignore formatting, headers, footers, signatures, quoted replies and unusual characters',
@@ -123,6 +124,23 @@ export class GenericProvider {
      */
     public async suggestReplyFromText(input: string, toneOfVoice: string): Promise<string> {
         throw new Error(browser.i18n.getMessage('errorInvalidAddonOptions'))
+    }
+
+    /**
+     * Suggests Thunderbird tag keys for the provided message using an allowed
+     * list of tags.
+     *
+     * @param input - The message content to analyze.
+     * @param availableTags - Allowed Thunderbird tags (key/tag/color/ordinal).
+     *
+     * @returns A Promise resolving to strict JSON text: {"tags": ["..."]}.
+     */
+    public async suggestTagsForMessage(input: string, availableTags: { key: string; tag: string; color: string; ordinal: string }[]): Promise<string> {
+        const allowedTagsAsJson = JSON.stringify(availableTags)
+        const systemPrompt = this.PROMPTS.SUGGEST_TAGS.replace('%language%', getLanguageNameFromCode(this.mainUserLanguageCode))
+        const composedPrompt = `${systemPrompt} Allowed tags: ${allowedTagsAsJson}`
+
+        return this.applyCustomPrompt(composedPrompt, input)
     }
 
     /**

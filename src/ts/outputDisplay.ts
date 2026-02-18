@@ -20,6 +20,10 @@ browser.runtime.onMessage.addListener(async (message: any) => {
                 addText(message.content)
                 break
 
+            case 'addTagsSummary':
+                addTagsSummary(message.content)
+                break
+
             case 'insertTextAtCursor':
                 insertTextAtCursor(message.content)
                 break
@@ -92,6 +96,61 @@ function addText(newContent: string) {
     // Any Markdown present is converted to plain text
     const rawText = removeMarkdown(newContent)
     getInnerResponse().querySelector('#amsContent').textContent = rawText
+}
+
+function addTagsSummary(content: { intro?: string; tags?: { label?: string; color?: string }[] }) {
+    clearOutputDisplay()
+
+    const innerResponse = getInnerResponse()
+    innerResponse.classList.add('text-content')
+
+    const target = innerResponse.querySelector('#amsContent') as HTMLDivElement
+    target.innerHTML = ''
+
+    const wrapper = document.createElement('div')
+    wrapper.className = 'auto-tags-summary'
+
+    const intro = document.createElement('p')
+    intro.className = 'auto-tags-intro'
+    intro.textContent = content?.intro || browser.i18n.getMessage('autoTagsSuccessIntro')
+    wrapper.appendChild(intro)
+
+    const tagsContainer = document.createElement('div')
+    tagsContainer.className = 'auto-tags-badges'
+
+    const tags = Array.isArray(content?.tags) ? content.tags : []
+
+    tags.forEach((tag) => {
+        const badge = document.createElement('span')
+        badge.className = 'auto-tag-badge'
+        badge.style.display = 'inline-flex'
+        badge.style.alignItems = 'center'
+        badge.style.marginRight = '8px'
+        badge.style.marginBottom = '6px'
+        badge.style.padding = '4px 10px'
+        badge.style.borderRadius = '999px'
+        badge.style.border = '1px solid var(--border-color)'
+
+        const dot = document.createElement('span')
+        dot.className = 'auto-tag-dot'
+        dot.style.backgroundColor = tag?.color || '#6b7280'
+        dot.style.display = 'inline-block'
+        dot.style.width = '10px'
+        dot.style.height = '10px'
+        dot.style.borderRadius = '50%'
+        dot.style.marginRight = '8px'
+
+        const label = document.createElement('span')
+        label.className = 'auto-tag-label'
+        label.textContent = tag?.label || browser.i18n.getMessage('autoTagsDefaultLabel')
+
+        badge.appendChild(dot)
+        badge.appendChild(label)
+        tagsContainer.appendChild(badge)
+    })
+
+    wrapper.appendChild(tagsContainer)
+    target.appendChild(wrapper)
 }
 
 function showError(newContent: string) {

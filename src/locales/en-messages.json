@@ -11,6 +11,30 @@
         "message": "Options are invalid. Configure the necessary settings for the \"AI Mail Support\" add-on.",
         "description": "Text displayed when the add-on options are invalid and an attempt is made to invoke one of the options that requires the configuration of an AI system."
     },
+    "errorAutoTagsMessageNotAvailable": {
+        "message": "Auto Tags is available only when viewing an existing email.",
+        "description": "Error shown if Auto Tags is triggered while no displayed message is available."
+    },
+    "errorAutoTagsNoAvailableTags": {
+        "message": "No Thunderbird tags are available.",
+        "description": "Error shown when no Thunderbird tags are configured."
+    },
+    "errorAutoTagsInvalidResponse": {
+        "message": "The AI response for Auto Tags is invalid.",
+        "description": "Error shown when the AI response cannot be parsed to extract tags."
+    },
+    "autoTagsNoTagApplied": {
+        "message": "no tag",
+        "description": "Text used when Auto Tags does not select any tag."
+    },
+    "autoTagsSuccessMessage": {
+        "message": "I categorized your email into $1",
+        "description": "Confirmation message shown after automatically applying tags."
+    },
+    "autoTagsSuccessIntro": {
+        "message": "I categorized your email into:",
+        "description": "Intro shown before Auto Tags colored badges."
+    },
     "errorTextNotFound": {
         "message": "Unable to retrieve text for processing.",
         "description": "Text displayed when text cannot be retrieved for processing."
@@ -210,6 +234,10 @@
     "mailCustomPrompt": {
         "message": "Custom Prompt",
         "description": "Menu option to apply a user-defined prompt."
+    },
+    "mailAutoTags": {
+        "message": "Auto Tags",
+        "description": "Menu option to automatically assign Thunderbird tags based on the email content."
     },
     "mailCustomPrompts": {
         "message": "Custom prompts",

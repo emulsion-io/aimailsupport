@@ -195,6 +195,10 @@ AI Mail Support for Thunderbird aims to make use of a minimal set of permissions
   Used to create custom menus, see https://webextension-api.thunderbird.net/en/latest/menus.html#permissions.
 - messagesRead: Read your email messages.  
   Used to read the content of an existing email in the viewing window, see https://webextension-api.thunderbird.net/en/latest/messages.html#permissions.
+- messagesTagsList: List available Thunderbird message tags.  
+  Used by the Auto Tags feature to retrieve existing tags before asking the AI to choose from them, see https://webextension-api.thunderbird.net/en/latest/messages.tags.html#permissions.
+- messagesUpdate: Change message properties and tags.  
+  Used by the Auto Tags feature to apply AI-selected tags to the current message, see https://webextension-api.thunderbird.net/en/latest/messages.html#update-messageid-newproperties.
 - messagesModify: Read and modify your email messages as they are displayed to you.  
   Used to modify the content of an existing email in the viewing window, see https://webextension-api.thunderbird.net/en/latest/messageDisplayScripts.html#permissions.
 - sensitiveDataUpload: Email content is sent to the selected LLM service provider for processing, based on your choices in the add-on's settings.

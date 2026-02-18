@@ -8,6 +8,24 @@
     "errorInvalidAddonOptions": {
         "message": "Le opzioni non sono valide. Configura le impostazioni necessarie per l'estensione \"AI Mail Support\"."
     },
+    "errorAutoTagsMessageNotAvailable": {
+        "message": "Auto Tags è disponibile solo durante la visualizzazione di una e-mail esistente."
+    },
+    "errorAutoTagsNoAvailableTags": {
+        "message": "Nessuna etichetta Thunderbird disponibile."
+    },
+    "errorAutoTagsInvalidResponse": {
+        "message": "La risposta IA per Auto Tags non è valida."
+    },
+    "autoTagsNoTagApplied": {
+        "message": "nessuna etichetta"
+    },
+    "autoTagsSuccessMessage": {
+        "message": "Ho classificato la tua email in $1"
+    },
+    "autoTagsSuccessIntro": {
+        "message": "Ho classificato la tua email in:"
+    },
     "errorTextNotFound": {
         "message": "Impossibile recuperare il testo per l'elaborazione."
     },
@@ -160,6 +178,9 @@
     },
     "mailCustomPrompt": {
         "message": "Prompt personalizzato"
+    },
+    "mailAutoTags": {
+        "message": "Auto Tags"
     },
     "mailCustomPrompts": {
         "message": "Prompt personalizzati"

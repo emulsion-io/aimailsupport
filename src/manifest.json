@@ -17,6 +17,8 @@
         "compose",
         "menus",
         "messagesRead",
+        "messagesTagsList",
+        "messagesUpdate",
         "messagesModify",
         "sensitiveDataUpload",
         "storage",

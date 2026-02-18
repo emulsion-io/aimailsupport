@@ -11,6 +11,30 @@
         "message": "Les options sont invalides. Configurez les paramètres nécessaires pour l'extension \"AI Mail Support\".",
         "description": "Texte affiché lorsque les options de l'extension sont invalides et qu'une tentative est faite pour invoquer l'une des options qui nécessite la configuration d'un système IA."
     },
+    "errorAutoTagsMessageNotAvailable": {
+        "message": "Auto Tags n'est disponible que lors de la consultation d'un e-mail existant.",
+        "description": "Erreur affichée si l'utilisateur déclenche Auto Tags sans message affiché."
+    },
+    "errorAutoTagsNoAvailableTags": {
+        "message": "Aucune étiquette Thunderbird n'est disponible.",
+        "description": "Erreur affichée lorsqu'aucune étiquette Thunderbird n'est définie."
+    },
+    "errorAutoTagsInvalidResponse": {
+        "message": "La réponse IA pour Auto Tags est invalide.",
+        "description": "Erreur affichée lorsque la réponse IA ne peut pas être analysée pour en extraire des étiquettes."
+    },
+    "autoTagsNoTagApplied": {
+        "message": "aucune étiquette",
+        "description": "Texte utilisé quand Auto Tags ne sélectionne aucune étiquette."
+    },
+    "autoTagsSuccessMessage": {
+        "message": "J'ai classé votre email dans $1",
+        "description": "Message de confirmation affiché après l'application automatique des étiquettes."
+    },
+    "autoTagsSuccessIntro": {
+        "message": "J'ai classé votre email dans :",
+        "description": "Introduction affichée avant les pastilles d'étiquettes Auto Tags."
+    },
     "errorTextNotFound": {
         "message": "Impossible de récupérer le texte pour le traitement.",
         "description": "Texte affiché lorsque le texte ne peut pas être récupéré pour le traitement."
@@ -210,6 +234,10 @@
     "mailCustomPrompt": {
         "message": "Invite personnalisée",
         "description": "Option de menu pour appliquer une invite définie par l'utilisateur."
+    },
+    "mailAutoTags": {
+        "message": "Auto Tags",
+        "description": "Option de menu pour attribuer automatiquement les étiquettes Thunderbird selon le contenu du mail."
     },
     "mailCustomPrompts": {
         "message": "Prompts personnalisés",

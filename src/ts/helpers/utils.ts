@@ -231,6 +231,7 @@ export async function logMessage(message: string, method: string = 'log'): Promi
 export async function sendMessageToActiveTab(
     message: 
         | { type: string; content: Blob | string | { [key: string]: number } }
+    | { type: 'addTagsSummary'; content: { intro: string; tags: { label: string; color: string }[] } }
         | { type: 'setComposeMode'; isCompose: boolean }
         | { type: 'hideOutput' }
         | { showPromptDisplay: boolean }

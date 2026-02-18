@@ -366,6 +366,15 @@ const menuIdCustomPrompt = messenger.menus.create({
     ]
 })
 
+const menuIdAutoTags = messenger.menus.create({
+    id: 'aiAutoTags',
+    title: browser.i18n.getMessage('mailAutoTags'),
+    contexts: [
+        'compose_action_menu',
+        'message_display_action_menu'
+    ]
+})
+
 const subMenuIdCustomPrompts = messenger.menus.create({
     id: 'aiSubMenuCustomPrompts',
     title: browser.i18n.getMessage('mailCustomPrompts'),
@@ -600,6 +609,72 @@ messenger.menus.onClicked.addListener(async (info: messenger.menus.OnClickData) 
             logMessage(`Error during saved custom prompt: ${error.message}`, 'error')
         })
     }
+    else if(info.menuItemId == menuIdAutoTags) {
+        try {
+            const tabs = await messenger.tabs.query({ active: true, currentWindow: true })
+            const displayedMessage = await messenger.messageDisplay.getDisplayedMessage(tabs[0].id)
+
+            if(!displayedMessage) {
+                sendMessageToActiveTab({type: 'showError', content: browser.i18n.getMessage('errorAutoTagsMessageNotAvailable')})
+                return
+            }
+
+            const availableTags = await messenger.messages.tags.list()
+
+            if(!availableTags || availableTags.length === 0) {
+                sendMessageToActiveTab({type: 'showError', content: browser.i18n.getMessage('errorAutoTagsNoAvailableTags')})
+                return
+            }
+
+            const messageSubject = displayedMessage.subject?.trim() || ''
+            const inputWithSubject = messageSubject
+                ? `Subject: ${messageSubject}\n\n${textToBeProcessed}`
+                : textToBeProcessed
+
+            const aiResponse = await llmProvider.suggestTagsForMessage(inputWithSubject, availableTags)
+            const suggestedTagKeys = extractSuggestedTagKeys(aiResponse, availableTags.map(tag => tag.key))
+
+            const mergedTags = Array.from(new Set([...(displayedMessage.tags || []), ...suggestedTagKeys]))
+
+            await messenger.messages.update(displayedMessage.id, { tags: mergedTags })
+
+            const tagsByKey = new Map(availableTags.map(tag => [tag.key, tag]))
+            const suggestedTagsForDisplay = suggestedTagKeys
+                .map((tagKey: string) => {
+                    const tag = tagsByKey.get(tagKey)
+                    if(!tag || !tag.tag) {
+                        return {
+                            label: tagKey,
+                            color: '#6b7280'
+                        }
+                    }
+
+                    return {
+                        label: tag.tag,
+                        color: tag.color || '#6b7280'
+                    }
+                })
+
+            if(suggestedTagsForDisplay.length > 0) {
+                sendMessageToActiveTab({
+                    type: 'addTagsSummary',
+                    content: {
+                        intro: browser.i18n.getMessage('autoTagsSuccessIntro') || "J'ai classé votre email dans :",
+                        tags: suggestedTagsForDisplay
+                    }
+                })
+            }
+            else {
+                sendMessageToActiveTab({
+                    type: 'addText',
+                    content: browser.i18n.getMessage('autoTagsSuccessMessage', [browser.i18n.getMessage('autoTagsNoTagApplied')])
+                })
+            }
+        } catch (error) {
+            sendMessageToActiveTab({type: 'showError', content: error.message || browser.i18n.getMessage('errorAutoTagsInvalidResponse')})
+            logMessage(`Error during auto tags assignment: ${error.message}`, 'error')
+        }
+    }
     // Fallback message case, but only if the menu does not match any values to
     // ignore, e.g., options.
     else if (!['aiOptions'].includes(info.menuItemId as string)) {
@@ -692,6 +767,10 @@ async function updateMenuVisibility(): Promise<void> {
 
     // canApplyCustomPrompt -->
     messenger.menus.update(menuIdCustomPrompt, {
+        enabled: llmProvider.canApplyCustomPrompt()
+    })
+
+    messenger.menus.update(menuIdAutoTags, {
         enabled: llmProvider.canApplyCustomPrompt()
     })
 
@@ -856,4 +935,31 @@ async function updateMenuWithUserCustomPromptPreferences(): Promise<void> {
             customPromptMenuItemIds.push(menuItemId)
         })
     }
+}
+
+function extractSuggestedTagKeys(rawResponse: string, allowedTagKeys: string[]): string[] {
+    const sanitizedResponse = rawResponse
+        .replace(/^```json\s*/i, '')
+        .replace(/^```\s*/i, '')
+        .replace(/\s*```$/i, '')
+        .trim()
+
+    let parsedResponse: { tags?: unknown }
+
+    try {
+        parsedResponse = JSON.parse(sanitizedResponse)
+    } catch {
+        throw new Error(browser.i18n.getMessage('errorAutoTagsInvalidResponse'))
+    }
+
+    if (!Array.isArray(parsedResponse?.tags)) {
+        throw new Error(browser.i18n.getMessage('errorAutoTagsInvalidResponse'))
+    }
+
+    return parsedResponse.tags
+        .filter((tag): tag is string => typeof tag === 'string')
+        .map((tag) => tag.trim())
+        .filter((tag) => allowedTagKeys.includes(tag))
+        .filter((tag, index, tags) => tags.indexOf(tag) === index)
+        .slice(0, 4)
 }
