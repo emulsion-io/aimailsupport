@@ -218,15 +218,20 @@ The add-on has a small set of messages that require localization. If you want to
 
 ## License and references
 
+### Project of Yellow Sakura
+
 This project is based on the original work by Yellow Sakura, licensed under MIT.
 
 [MIT](https://opensource.org/licenses/MIT) by [Yellow Sakura](https://www.yellowsakura.com), [support@yellowsakura.com](mailto:support@yellowsakura.com), see the LICENSE file.  
 For more details, please refer to the [project page](https://www.yellowsakura.com/en/projects/ai-mail-support-for-thunderbird) and the link to the [official AMO (addons.mozilla.org) page](https://addons.thunderbird.net/en-GB/thunderbird/addon/ai-mail-support).
 
+### Project evolution and maintenance
+
 Modifications and additional development:
+
 Copyright (c) 2026 Fabrice Simonet
 
-Dependencies:
+### Dependencies:
 
 * [ESLint](https://github.com/eslint/eslint) is licensed under [MIT License](https://opensource.org/licenses/MIT);
 * [parcel](https://github.com/parcel-bundler/parcel) is licensed under [MIT License](https://opensource.org/licenses/MIT);
