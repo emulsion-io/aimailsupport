@@ -4,7 +4,7 @@
 [![TypeScript](https://shields.io/badge/TypeScript-3178C6?logo=TypeScript&logoColor=FFF&style=flat-square)](https://www.typescriptlang.org)
 [![Thunderbird](https://img.shields.io/badge/Thunderbird-147ee1?logo=thunderbird&logoColor=white&style=flat-square)](https://www.thunderbird.net)
 
-[🇬🇧 Version anglaise](readme-en.md) | [🇫🇷 Version française](README.md)
+[🇬🇧 Version anglaise](README-EN.md) | [🇫🇷 Version française](README.md)
 
 <img align="left" width="100px" src="docs/icon.png" alt="Logo AI Mail Extended pour Thunderbird">
 
