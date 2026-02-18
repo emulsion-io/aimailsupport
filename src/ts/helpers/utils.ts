@@ -221,6 +221,8 @@ export async function logMessage(message: string, method: string = 'log'): Promi
  *          for structured messages with content
  *        - { type: 'setComposeMode'; isCompose: boolean }
  *          to notify about compose mode state changes
+ *        - { type: 'hideOutput' }
+ *          to close output display without rendering content
  *        - { showPromptDisplay: boolean }
  *          to toggle prompt display visibility
  *
@@ -230,6 +232,7 @@ export async function sendMessageToActiveTab(
     message: 
         | { type: string; content: Blob | string | { [key: string]: number } }
         | { type: 'setComposeMode'; isCompose: boolean }
+        | { type: 'hideOutput' }
         | { showPromptDisplay: boolean }
 ): Promise<void> {
     const tabs = await browser.tabs.query({ active: true, currentWindow: true })

@@ -477,7 +477,7 @@ messenger.menus.onClicked.addListener(async (info: messenger.menus.OnClickData) 
     else if(info.menuItemId == menuIdRephraseSummarizeKeyPoints) {
         llmProvider.summarizeDraftKeyPoints(textToBeProcessed).then((summaryAsBullets: string) => {
             sendMessageToActiveTab({ type: 'insertTextBelowSelection', content: summaryAsBullets })
-            sendMessageToActiveTab({ type: 'hideOutput' })
+            sendMessageToActiveTab({ type: 'hideOutput', content: '' })
         }).catch(error => {
             sendMessageToActiveTab({type: 'showError', content: error.message})
             logMessage(`Error during key points summarization from selection: ${error.message}`, 'error')
@@ -503,7 +503,7 @@ messenger.menus.onClicked.addListener(async (info: messenger.menus.OnClickData) 
     else if(info.menuItemId == menuIdSummarizeKeyPoints) {
         llmProvider.summarizeDraftKeyPoints(textToBeProcessed).then((summaryAsBullets: string) => {
             sendMessageToActiveTab({ type: 'insertTextAtCursor', content: summaryAsBullets })
-            sendMessageToActiveTab({ type: 'hideOutput' })
+            sendMessageToActiveTab({ type: 'hideOutput', content: '' })
         }).catch(error => {
             sendMessageToActiveTab({type: 'showError', content: error.message})
             logMessage(`Error during key points summarization: ${error.message}`, 'error')
