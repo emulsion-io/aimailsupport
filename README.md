@@ -59,11 +59,17 @@ Après l'installation de l'extension, vous pouvez configurer le fournisseur de s
 
 Vous pouvez accéder aux paramètres en allant dans `Outils → Modules complémentaires et thèmes`, puis en sélectionnant l'icône de clé à molette à côté d'AI Mail Support.
 
-<p align="center" width="100%"><img alt="Préférences de l'extension" src="docs/screen/screen-preferences.webp"></p>
+<p align="center" width="100%"><img alt="Préférences de l'extension" src="docs/screen/screen-preferences.png"></p>
 
-En fonction du choix du LLM, des options spécifiques supplémentaires deviendront disponibles. Par exemple, ci-dessous se trouve la capture d'écran de toutes les configurations possibles lorsque OpenAI est sélectionné comme fournisseur.
+Prompt personnalisé : En plus de la sélection du fournisseur LLM, vous pouvez activer une fonctionnalité de prompt personnalisé qui vous permet de définir votre propre prompt IA pour un traitement personnalisé.
 
-<p align="center" width="100%"><img alt="Préférences de l'extension pour OpenAI" src="docs/screen/screen-preferences-openai.webp"></p>
+Changement de theme : Vous pouvez également choisir entre les thèmes clair, sombre ou automatique pour l'interface de l'extension.
+
+<p align="center" width="100%"><img alt="Préférences de l'extension pour LM Studio" src="docs/screen/screen-preferences-prompt.png"></p>
+
+En fonction du choix du LLM, des options spécifiques supplémentaires deviendront disponibles. Par exemple, ci-dessous se trouve la capture d'écran de toutes les configurations possibles lorsque LM Studio est sélectionné comme fournisseur.
+
+<p align="center" width="100%"><img alt="Préférences de l'extension pour LM Studio" src="docs/screen/screen-preferences-lmstudio.png"></p>
 
 Typiquement, une clé d'authentification doit être configurée ; la méthode spécifique dépend du fournisseur LLM.  
 Dans les options, il y aura un lien rapide vers le site web officiel avec des détails utiles.
@@ -72,23 +78,23 @@ Une fois l'extension configurée, vous pouvez interagir avec les fonctionnalité
 
 1. Dans la fenêtre de visualisation d'email, via le menu "AI support" :
 
-<p align="center" width="100%"><img alt="Intégration du support IA dans la fenêtre de visualisation d'email" src="docs/screen/screen-view-email.webp"></p>
+<p align="center" width="100%"><img alt="Intégration du support IA dans la fenêtre de visualisation d'email" src="docs/screen/screen-view-email.png"></p>
 
 2. Dans la fenêtre de composition ou d'édition d'email, en sélectionnant "AI support" en haut à droite :
 
-<p align="center" width="100%"><img alt="Intégration du support IA dans la fenêtre de composition ou d'édition d'email" src="docs/screen/screen-compose-email.webp"></p>
+<p align="center" width="100%"><img alt="Intégration du support IA dans la fenêtre de composition ou d'édition d'email" src="docs/screen/screen-compose-email.png"></p>
 
 3. En sélectionnant n'importe quel texte dans la fenêtre de visualisation ou de composition d'email, dans la section "AI Mail Support" du menu contextuel :
 
-<p align="center" width="100%"><img alt="Intégration du support IA dans le texte sélectionné" src="docs/screen/screen-selected-text.webp"></p>
+<p align="center" width="100%"><img alt="Intégration du support IA dans le texte sélectionné" src="docs/screen/screen-selected-text.png"></p>
 
 Quel que soit le moyen utilisé pour demander un traitement, la sortie (audio ou texte) sera affichée dans une popup dédiée en bas du client de messagerie.
 
-<p align="center" width="100%"><img alt="Sortie" src="docs/screen/screen-output.webp"></p>
+<p align="center" width="100%"><img alt="Sortie" src="docs/screen/screen-output.png"></p>
 
 Que ce soit dans la fenêtre de visualisation ou de composition d'email, vous pouvez toujours activer la fonctionnalité de prompt personnalisé pour recevoir des réponses encore plus pertinentes adaptées à vos besoins.
 
-<p align="center" width="100%"><img alt="Prompt personnalisé" src="docs/screen/screen-custom-prompt.webp"></p>
+<p align="center" width="100%"><img alt="Prompt personnalisé" src="docs/screen/screen-custom-prompt.png"></p>
 
 ### Bug Owl for Exchange
 

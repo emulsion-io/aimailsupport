@@ -59,11 +59,17 @@ After installing the add-on, you can configure the desired LLM service provider 
 
 You can access the settings by going to `Tools → Add-ons and Themes`, and then selecting the wrench icon next to AI Mail Support.
 
-<p align="center" width="100%"><img alt="Add-on preferences" src="docs/screen/screen-preferences.webp"></p>
+<p align="center" width="100%"><img alt="Add-on preferences" src="docs/screen/screen-preferences.png"></p>
 
-Based on the LLM choice, additional specific options will become available. For example, below is the screenshot of all possible configurations when OpenAI is selected as the provider.
+Custom prompt: In addition to selecting the LLM provider, you can enable a custom prompt feature that allows you to define your own AI prompt for personalized processing.
 
-<p align="center" width="100%"><img alt="Add-on preferences for OpenAI" src="docs/screen/screen-preferences-openai.webp"></p>
+Theme change: You can also choose between light, dark, or automatic themes for the add-on interface.
+
+<p align="center" width="100%"><img alt="Add-on preferences for LM Studio" src="docs/screen/screen-preferences-prompt.png"></p>
+
+Based on the LLM choice, additional specific options will become available. For example, below is the screenshot of all possible configurations when LM Studio is selected as the provider.
+
+<p align="center" width="100%"><img alt="Add-on preferences for LM Studio" src="docs/screen/screen-preferences-lmstudio.png"></p>
 
 Typically, an authentication key needs to be configured; the specific method depends on the LLM provider.  
 In the options, there will be a quick link to the official website with useful details.
@@ -72,23 +78,23 @@ Once the add-on is configured, you can interact with the AI management features 
 
 1. In the email view, via the "AI support" menu:
 
-<p align="center" width="100%"><img alt="AI support integration in email view" src="docs/screen/screen-view-email.webp"></p>
+<p align="center" width="100%"><img alt="AI support integration in email view" src="docs/screen/screen-view-email.png"></p>
 
 2. In the email composition or editing window, by selecting "AI support" in the top right:
 
-<p align="center" width="100%"><img alt="AI support integration in email composition or editing window" src="docs/screen/screen-compose-email.webp"></p>
+<p align="center" width="100%"><img alt="AI support integration in email composition or editing window" src="docs/screen/screen-compose-email.png"></p>
 
 3. By selecting any text in either the email viewing or composition window, in the "AI Mail Support" section of the context menu:
 
-<p align="center" width="100%"><img alt="AI support integration in selected text" src="docs/screen/screen-selected-text.webp"></p>
+<p align="center" width="100%"><img alt="AI support integration in selected text" src="docs/screen/screen-selected-text.png"></p>
 
 Regardless of how a request for processing is made, the output (audio or text) will be displayed in a dedicated pop-up at the bottom of the mail client.
 
-<p align="center" width="100%"><img alt="Output" src="docs/screen/screen-output.webp"></p>
+<p align="center" width="100%"><img alt="Output" src="docs/screen/screen-output.png"></p>
 
 Whether in the email viewing or composition window, you can always enable the custom prompt feature to receive even more relevant responses tailored to your needs.
 
-<p align="center" width="100%"><img alt="Custom prompt" src="docs/screen/screen-custom-prompt.webp"></p>
+<p align="center" width="100%"><img alt="Custom prompt" src="docs/screen/screen-custom-prompt.png"></p>
 
 ### Owl for Exchange bug
 
@@ -329,3 +335,11 @@ Copyright (c) 2026 Fabrice Simonet
 Images:
 
 * Robots logo icons in `docs/bot-icon-*` were created by [Smashicons - Freepik](https://www.freepik.com/icon/bot_4712106)
+
+CSS effects:
+
+* Loader [Andrew Manzyk](https://uiverse.io/andrew-manzyk/young-walrus-64)
+
+---
+
+All trademarks mentioned are the property of their respective owners.

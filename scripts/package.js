@@ -4,7 +4,7 @@ const archiver = require('archiver');
 
 const sourceDir = path.join(__dirname, '..', 'ai-mail-support');
 const outputDir = path.join(__dirname, '..', 'dist');
-const outputFile = path.join(outputDir, 'ai-mail-support.xpi');
+const outputFile = path.join(outputDir, 'ai-mail-extended.xpi');
 
 // Créer le dossier dist si nécessaire
 if (!fs.existsSync(outputDir)) {
