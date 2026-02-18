@@ -1,99 +1,172 @@
-# AI Mail Extended for Thunderbird
+# AI Mail Extended pour Thunderbird
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://shields.io/badge/TypeScript-3178C6?logo=TypeScript&logoColor=FFF&style=flat-square)](https://www.typescriptlang.org)
 [![Thunderbird](https://img.shields.io/badge/Thunderbird-147ee1?logo=thunderbird&logoColor=white&style=flat-square)](https://www.thunderbird.net)
 
-<img align="left" width="100px" src="docs/icon.png" alt="AI Mail Extended for Thunderbird logo">
+[🇬🇧 Version anglaise](readme-en.md) | [🇫🇷 Version française](README.md)
 
-Thunderbird add-on designed to enhance both professional and personal email management.  
-This add-on integrates a range of AI (LLM) features to streamline your inbox experience.
+<img align="left" width="100px" src="docs/icon.png" alt="Logo AI Mail Extended pour Thunderbird">
 
-Our aim is to assist users dealing with high volumes of daily emails, providing tools for tasks like summarizing messages, translating content, offering structured support for composing responses, and much more.
+Extension Thunderbird conçue pour améliorer la gestion professionnelle et personnelle des emails.  
+Cette extension intègre une gamme de fonctionnalités IA (LLM) pour rationaliser votre expérience de boîte de réception.
 
-## Contents
+Notre objectif est d'aider les utilisateurs confrontés à de gros volumes d'emails quotidiens, en fournissant des outils pour des tâches telles que la synthèse de messages, la traduction de contenu, l'offre d'un support structuré pour la composition de réponses, et bien plus encore.
 
-1. [Getting started](#getting-started)
-   - [Settings and usage](#settings-and-usage)
-   - [Owl for Exchange bug](#owl-for-exchange-bug)
-2. [Build](#build)
-3. [Permissions details](#permissions-details)
-4. [Localization](#localization)
-5. [License and references](#license-and-references)
+## Table des matières
 
-## Getting started
+1. [Premiers pas](#premiers-pas)
+   - [Paramètres et utilisation](#paramètres-et-utilisation)
+   - [Bug Owl for Exchange](#bug-owl-for-exchange)
+2. [Fonctionnalités](#fonctionnalités)
+3. [Construction](#construction)
+4. [Détails des permissions](#détails-des-permissions)
+5. [Localisation](#localisation)
+6. [Licence et références](#licence-et-références)
 
-Have you ever had an inbox full of hundreds of unread emails that you need to respond to?  
-We have, and more than once.
+## Premiers pas
 
-That's why we decided to create this add-on for Thunderbird to help manage the multitude of emails we read daily as part of our work activities.
+Avez-vous déjà eu une boîte de réception pleine de centaines d'emails non lus que vous devez répondre ?  
+Nous aussi, et plus d'une fois.
 
-Several LLMs (Large Language Models) are integrated to provide a range of options for advanced text management, operating at the deepest possible semantic level, to optimize the management of your email inbox.  
-The LLMs* currently supported are:
+C'est pourquoi nous avons créé cette extension pour Thunderbird afin d'aider à gérer la multitude d'emails que nous lisons quotidiennement dans le cadre de nos activités professionnelles.
 
-* Claude by [Anthropic](https://www.anthropic.com);
-* DeepSeek by [Hangzhou DeepSeek Artificial Intelligence Basic Technology Research](https://www.deepseek.com);
-* Gemini by [Google](https://ai.google.dev);
-* GPT by [OpenAI](https://openai.com);
-* Grok by [xAI](https://x.ai);
-* Mistral by [Mistral AI](https://mistral.ai).
+Plusieurs LLM (Large Language Models) sont intégrés pour fournir une gamme d'options de gestion de texte avancée, opérant au niveau sémantique le plus profond possible, pour optimiser la gestion de votre boîte de réception email.  
+Les LLM* actuellement supportés sont :
 
-It is possible to access a wider set of models (e.g., Llama, Phi, Mistral, Gemma, and many others) through the use of:
+* Claude par [Anthropic](https://www.anthropic.com) ;
+* DeepSeek par [Hangzhou DeepSeek Artificial Intelligence Basic Technology Research](https://www.deepseek.com) ;
+* Gemini par [Google](https://ai.google.dev) ;
+* GPT par [OpenAI](https://openai.com) ;
+* Grok par [xAI](https://x.ai) ;
+* Mistral par [Mistral AI](https://mistral.ai).
 
-* [Groq Cloud*](https://groq.com);
-* [LM Studio](https://lmstudio.ai);
+Il est possible d'accéder à un ensemble plus large de modèles (par exemple, Llama, Phi, Mistral, Gemma, et bien d'autres) grâce à l'utilisation de :
+
+* [Groq Cloud*](https://groq.com) ;
+* [LM Studio](https://lmstudio.ai) ;
 * [Ollama](https://ollama.com).
 
-\* To use them, it is necessary to create an account on the respective platforms and enable an API access key. <u>Usage fees apply</u>; for more details, please refer to the respective websites.
+\* Pour les utiliser, il est nécessaire de créer un compte sur les plateformes respectives et d'activer une clé d'accès API. <u>Des frais d'utilisation s'appliquent</u> ; pour plus de détails, veuillez vous référer aux sites web respectifs.
 
-**ATTENTION 1**: The services offered by Groq Cloud and Mistral AI include the option to use a free plan, albeit with low rate limits on requests.  
-**ATTENTION 2**: Unlike other LLM models, LM Studio and Ollama allow you to run open-source models directly on your own PC, with no additional costs and maximum privacy, as everything is executed locally.  
-The downside is that this requires *SIGNIFICANT* hardware resources.
+**ATTENTION 1** : Les services offerts par Groq Cloud et Mistral AI incluent l'option d'utiliser un plan gratuit, mais avec des limites de débit faibles sur les demandes.  
+**ATTENTION 2** : Contrairement aux autres modèles LLM, LM Studio et Ollama permettent d'exécuter des modèles open-source directement sur votre propre PC, sans coûts supplémentaires et avec une confidentialité maximale, car tout est exécuté localement.  
+Le revers de la médaille est que cela nécessite des ressources matérielles *SIGNIFICATIVES*.
 
-### Settings and usage
+### Paramètres et utilisation
 
-After installing the add-on, you can configure the desired LLM service provider from the add-on's settings.
+Après l'installation de l'extension, vous pouvez configurer le fournisseur de services LLM souhaité depuis les paramètres de l'extension.
 
-You can access the settings by going to `Tools → Add-ons and Themes`, and then selecting the wrench icon next to AI Mail Support.
+Vous pouvez accéder aux paramètres en allant dans `Outils → Modules complémentaires et thèmes`, puis en sélectionnant l'icône de clé à molette à côté d'AI Mail Support.
 
-<p align="center" width="100%"><img alt="Add-on preferences" src="docs/screen/screen-preferences.webp"></p>
+<p align="center" width="100%"><img alt="Préférences de l'extension" src="docs/screen/screen-preferences.webp"></p>
 
-Based on the LLM choice, additional specific options will become available. For example, below is the screenshot of all possible configurations when OpenAI is selected as the provider.
+En fonction du choix du LLM, des options spécifiques supplémentaires deviendront disponibles. Par exemple, ci-dessous se trouve la capture d'écran de toutes les configurations possibles lorsque OpenAI est sélectionné comme fournisseur.
 
-<p align="center" width="100%"><img alt="Add-on preferences for OpenAI" src="docs/screen/screen-preferences-openai.webp"></p>
+<p align="center" width="100%"><img alt="Préférences de l'extension pour OpenAI" src="docs/screen/screen-preferences-openai.webp"></p>
 
-Typically, an authentication key needs to be configured; the specific method depends on the LLM provider.  
-In the options, there will be a quick link to the official website with useful details.
+Typiquement, une clé d'authentification doit être configurée ; la méthode spécifique dépend du fournisseur LLM.  
+Dans les options, il y aura un lien rapide vers le site web officiel avec des détails utiles.
 
-Once the add-on is configured, you can interact with the AI management features within Thunderbird in three different locations:
+Une fois l'extension configurée, vous pouvez interagir avec les fonctionnalités de gestion IA dans Thunderbird à trois endroits différents :
 
-1. In the email view, via the "AI support" menu:
+1. Dans la fenêtre de visualisation d'email, via le menu "AI support" :
 
-<p align="center" width="100%"><img alt="AI support integration in email view" src="docs/screen/screen-view-email.webp"></p>
+<p align="center" width="100%"><img alt="Intégration du support IA dans la fenêtre de visualisation d'email" src="docs/screen/screen-view-email.webp"></p>
 
-2. In the email composition or editing window, by selecting "AI support" in the top right:
+2. Dans la fenêtre de composition ou d'édition d'email, en sélectionnant "AI support" en haut à droite :
 
-<p align="center" width="100%"><img alt="AI support integration in email composition or editing window" src="docs/screen/screen-compose-email.webp"></p>
+<p align="center" width="100%"><img alt="Intégration du support IA dans la fenêtre de composition ou d'édition d'email" src="docs/screen/screen-compose-email.webp"></p>
 
-3. By selecting any text in either the email viewing or composition window, in the "AI Mail Support" section of the context menu:
+3. En sélectionnant n'importe quel texte dans la fenêtre de visualisation ou de composition d'email, dans la section "AI Mail Support" du menu contextuel :
 
-<p align="center" width="100%"><img alt="AI support integration in selected text" src="docs/screen/screen-selected-text.webp"></p>
+<p align="center" width="100%"><img alt="Intégration du support IA dans le texte sélectionné" src="docs/screen/screen-selected-text.webp"></p>
 
-Regardless of how a request for processing is made, the output (audio or text) will be displayed in a dedicated pop-up at the bottom of the mail client.
+Quel que soit le moyen utilisé pour demander un traitement, la sortie (audio ou texte) sera affichée dans une popup dédiée en bas du client de messagerie.
 
-<p align="center" width="100%"><img alt="Output" src="docs/screen/screen-output.webp"></p>
+<p align="center" width="100%"><img alt="Sortie" src="docs/screen/screen-output.webp"></p>
 
-Whether in the email viewing or composition window, you can always enable the custom prompt feature to receive even more relevant responses tailored to your needs.
+Que ce soit dans la fenêtre de visualisation ou de composition d'email, vous pouvez toujours activer la fonctionnalité de prompt personnalisé pour recevoir des réponses encore plus pertinentes adaptées à vos besoins.
 
-<p align="center" width="100%"><img alt="Custom prompt" src="docs/screen/screen-custom-prompt.webp"></p>
+<p align="center" width="100%"><img alt="Prompt personnalisé" src="docs/screen/screen-custom-prompt.webp"></p>
 
-### Owl for Exchange bug
+### Bug Owl for Exchange
 
-If you use the [Owl for Exchange](https://addons.thunderbird.net/en-us/thunderbird/addon/owl-for-exchange) add-on to manage Exchange or Office365 accounts, ⚠️ **there is a known bug** that interferes with the [scripting.messageDisplay API](https://webextension-api.thunderbird.net/en/mv3/scripting.messageDisplay.html) and will prevent AI Mail Support for Thunderbird from functioning correctly when previewing an email.
+Si vous utilisez l'extension [Owl for Exchange](https://addons.thunderbird.net/en-us/thunderbird/addon/owl-for-exchange) pour gérer des comptes Exchange ou Office365, ⚠️ **il y a un bug connu** qui interfère avec l'[API scripting.messageDisplay](https://webextension-api.thunderbird.net/en/mv3/scripting.messageDisplay.html) et empêchera AI Mail Support for Thunderbird de fonctionner correctement lors de l'aperçu d'un email.
 
-## Build
+## Fonctionnalités
 
-Run the following to build the add-on directly from the source code:
+Cette extension Thunderbird fournit des outils complets de gestion d'emails alimentés par IA. Ci-dessous une analyse détaillée de toutes les fonctionnalités disponibles basée sur l'examen du code source :
+
+### Fonctionnalités IA de base
+
+#### Analyse et compréhension de texte
+- **Analyser l'intention** : Analyse le ton et l'intention perçue d'un email en cours de rédaction, fournissant des insights sur la façon dont l'email pourrait être perçu par les destinataires
+- **Expliquer** : Simplifie et explique le contenu des emails dans un langage clair et accessible tout en préservant le sens original
+
+#### Transformation de contenu
+- **Reformuler** : Offre plusieurs options de reformulation avec différents tons :
+  - Standard, Fluide, Créatif, Simple, Formel, Académique, Étendu, Raccourci, Poli
+- **Résumer** : Crée des résumés concis se concentrant sur le message ou la demande principale de l'expéditeur
+- **Résumer les points clés** : Extrait 3-5 points clés des brouillons d'emails sous forme de liste à puces
+
+#### Assistance à la communication
+- **Suggérer une réponse** : Génère des suggestions de réponse avec différents tons :
+  - Standard, Fluide, Créatif, Simple, Formel, Académique, Étendu, Raccourci, Poli
+- **Suggérer des améliorations** : Fournit des recommandations pour la clarté, le ton et l'efficacité des brouillons d'emails
+
+#### Langue et accessibilité
+- **Traduire** : Traduit le contenu des emails dans les langues spécifiées de manière naturelle et précise
+- **Texte vers parole** : Convertit le contenu textuel en audio pour l'écoute (disponible avec le fournisseur OpenAI)
+- **Prompt personnalisé** : Permet aux utilisateurs d'appliquer leurs propres prompts IA pour un traitement personnalisé
+
+#### Organisation et étiquetage
+- **Auto Tags** : Suggère et applique automatiquement des étiquettes Thunderbird basées sur l'analyse du contenu des emails
+  - Priorise les mots-clés du sujet, utilise le corps pour affiner le contexte
+  - Limite à maximum 4 étiquettes uniques
+  - Affiche des badges colorés dans l'interface
+  - Déduplique les étiquettes pour éviter la redondance
+
+### Implémentation technique
+
+#### Support des fournisseurs LLM
+L'extension prend en charge plusieurs fournisseurs IA :
+- **Fournisseurs API directs** : Anthropic Claude, DeepSeek, Google Gemini, OpenAI GPT, xAI Grok, Mistral AI
+- **Plateformes cloud** : Groq Cloud, fournissant accès à des modèles supplémentaires
+- **Solutions locales** : LM Studio et Ollama pour un traitement IA local axé sur la confidentialité
+
+#### Menus contextuels
+Les fonctionnalités sont disponibles via plusieurs points d'accès :
+- Fenêtre de visualisation d'email (message_display_action_menu)
+- Fenêtre de composition d'email (compose_action_menu)
+- Menu contextuel de sélection de texte (selection)
+
+#### Traitement avancé
+- Ignore la mise en forme, les en-têtes, pieds de page, signatures et réponses citées lors de l'analyse
+- Prend en charge plusieurs langues avec des prompts localisés
+- Implémente des vérifications de sécurité et de modération de contenu (fournisseur OpenAI)
+- Gère les gros threads d'emails avec une ingénierie de prompts optimisée
+
+#### Expérience utilisateur
+- Affichage de sortie en temps réel dans des popups dédiées
+- Badges d'étiquettes colorés pour un retour visuel
+- Paramètres configurables de timeout et température
+- Gestion d'erreurs complète et retour d'information utilisateur
+
+### Points d'intégration
+
+L'extension s'intègre profondément avec les APIs de Thunderbird :
+- Lecture et modification de messages
+- Gestion et application d'étiquettes
+- Interaction avec la fenêtre de composition
+- Personnalisation des menus contextuels
+- Stockage des préférences utilisateur
+
+Toutes les fonctionnalités sont conçues pour fonctionner de manière transparente dans le workflow de Thunderbird, améliorant la productivité des utilisateurs traitant de gros volumes d'emails.
+
+## Construction
+
+Exécutez ce qui suit pour construire l'extension directement depuis le code source :
 
 ```console
 $ git clone https://github.com/YellowSakura/aimailsupport.git
@@ -101,153 +174,161 @@ $ cd aimailsupport
 $ npm install
 ```
 
-To compile a development version of the add-on and install it in Thunderbird via `Tools → Developer Tools → Debug Add-ons → Load Temporary Add-on…`, use the following command:
+Pour compiler une version de développement de l'extension et l'installer dans Thunderbird via `Outils → Outils de développement → Déboguer les modules complémentaires → Charger un module complémentaire temporaire…`, utilisez la commande suivante :
 
 ```console
 $ npm run build
 ```
 
-### Icons
+### Icônes
 
-The add-on icon source file is:
+Le fichier source de l'icône de l'extension est :
 
 ```text
 docs/icon.png
 ```
 
-Icon assets used by the manifest are generated automatically in:
+Les ressources d'icônes utilisées par le manifest sont générées automatiquement dans :
 
 ```text
 ai-mail-support/images/
 ```
 
-You can regenerate icons manually with:
+Vous pouvez régénérer les icônes manuellement avec :
 
 ```console
 $ npm run build:icons
 ```
 
-This command generates the required sizes and variants used in `src/manifest.json`:
+Cette commande génère les tailles et variantes requises utilisées dans `src/manifest.json` :
 
 - `icon-color-{16,32,64}.png`
 - `icon-light-{16,32,64}.png`
 - `icon-dark-{16,32,64}.png`
 
-Note: `npm run build` already runs `npm run build:icons` before building the add-on.
+Note : `npm run build` exécute déjà `npm run build:icons` avant de construire l'extension.
 
-To generate a file named ai-mail-support.xpi in the project's root folder, as a package ready for installation as an add-on in Thunderbird, use the following command:
+Pour générer un fichier nommé ai-mail-support.xpi dans le dossier racine du projet, comme un package prêt pour l'installation en tant que module complémentaire dans Thunderbird, utilisez la commande suivante :
+
+```console
+$ npm run package
+```
+
+Cette commande construit l'extension et la package dans un fichier .xpi dans le dossier `dist/`, compatible avec Windows, Linux et macOS.
+
+Pour une compatibilité avec les systèmes Unix uniquement, vous pouvez également utiliser :
 
 ```console
 $ npm run build:package
 ```
 
-To assess the overall quality of the code, you can use the following command:
+Pour évaluer la qualité globale du code, vous pouvez utiliser la commande suivante :
 
 ```console
 $ npm run lint
 ```
 
-It is possible to run unit tests using the command:
+Il est possible d'exécuter des tests unitaires en utilisant la commande :
 
 ```console
 $ npm run test
 ```
 
-You can run a specific group of tests for a single provider using the command:
+Vous pouvez exécuter un groupe spécifique de tests pour un fournisseur unique en utilisant la commande :
 
 ```console
 $ npm run test:single "AnthropicClaudeProvider"
 ```
 
-Before running any tests, you need to create an `.env` file in the project root directory with the keys for the various LLM services in the following format:
+Avant d'exécuter des tests, vous devez créer un fichier `.env` dans le répertoire racine du projet avec les clés des différents services LLM au format suivant :
 
 ```
-anthropic_api_key = KEY_VALUE
-deepseek_api_key = KEY_VALUE
-google_api_key = KEY_VALUE
-groq_api_key = KEY_VALUE
-mistral_api_key = KEY_VALUE
-openai_api_key = KEY_VALUE
-xai_api_key = KEY_VALUE
+anthropic_api_key = CLE_VALEUR
+deepseek_api_key = CLE_VALEUR
+google_api_key = CLE_VALEUR
+groq_api_key = CLE_VALEUR
+mistral_api_key = CLE_VALEUR
+openai_api_key = CLE_VALEUR
+xai_api_key = CLE_VALEUR
 ```
 
-To test LM Studio, it is necessary to install the model ```llama-3.2-1b``` from the GUI or using the command:
+Pour tester LM Studio, il est nécessaire d'installer le modèle ```llama-3.2-1b``` depuis l'interface graphique ou en utilisant la commande :
 
 ```console
 $ lms get llama-3.2-1b
 ```
 
-To test Ollama, it is necessary to install the model ```llama3.2:1b``` using the command:
+Pour tester Ollama, il est nécessaire d'installer le modèle ```llama3.2:1b``` en utilisant la commande :
 
 ```console
 $ ollama pull llama3.2:1b
 ```
 
-## Permissions details
+## Détails des permissions
 
-AI Mail Support for Thunderbird aims to make use of a minimal set of permissions for its operation, specifically:
+AI Mail Support for Thunderbird vise à utiliser un ensemble minimal de permissions pour son fonctionnement, spécifiquement :
 
-- accountsRead: See your mail accounts, their identities, and their folders.  
-  Used to identify the presence of any accounts managed by the [Owl for Exchange](https://addons.thunderbird.net/en-us/thunderbird/addon/owl-for-exchange) add-on and display a malfunction warning as indicated in the [Owl for Exchange bug section](#owl-for-exchange-bug), see https://webextension-api.thunderbird.net/en/latest/accounts.html#permissions.
-- compose: Read and modify your email messages as you compose and send them.  
-  Used to interact with the email composition window (replying or creating a new email), see https://webextension-api.thunderbird.net/en/latest/compose.html#permissions.
-- menus: Required to use `messenger.menus.*` functions.  
-  Used to create custom menus, see https://webextension-api.thunderbird.net/en/latest/menus.html#permissions.
-- messagesRead: Read your email messages.  
-  Used to read the content of an existing email in the viewing window, see https://webextension-api.thunderbird.net/en/latest/messages.html#permissions.
-- messagesTagsList: List available Thunderbird message tags.  
-  Used by the Auto Tags feature to retrieve existing tags before asking the AI to choose from them, see https://webextension-api.thunderbird.net/en/latest/messages.tags.html#permissions.
-- messagesUpdate: Change message properties and tags.  
-  Used by the Auto Tags feature to apply AI-selected tags to the current message, see https://webextension-api.thunderbird.net/en/latest/messages.html#update-messageid-newproperties.
-- messagesModify: Read and modify your email messages as they are displayed to you.  
-  Used to modify the content of an existing email in the viewing window, see https://webextension-api.thunderbird.net/en/latest/messageDisplayScripts.html#permissions.
-- sensitiveDataUpload: Email content is sent to the selected LLM service provider for processing, based on your choices in the add-on's settings.
-- storage: Enables the add-on to store and retrieve data, and listen for changes to stored items.  
-  Used to store user settings, see https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/storage.
+- accountsRead : Voir vos comptes de messagerie, leurs identités et leurs dossiers.  
+  Utilisé pour identifier la présence de comptes gérés par l'extension [Owl for Exchange](https://addons.thunderbird.net/en-us/thunderbird/addon/owl-for-exchange) et afficher un avertissement de dysfonctionnement tel qu'indiqué dans la section [Bug Owl for Exchange](#bug-owl-for-exchange), voir https://webextension-api.thunderbird.net/en/latest/accounts.html#permissions.
+- compose : Lire et modifier vos messages électroniques lorsque vous les composez et envoyez.  
+  Utilisé pour interagir avec la fenêtre de composition d'email (répondre ou créer un nouvel email), voir https://webextension-api.thunderbird.net/en/latest/compose.html#permissions.
+- menus : Requis pour utiliser les fonctions `messenger.menus.*`.  
+  Utilisé pour créer des menus personnalisés, voir https://webextension-api.thunderbird.net/en/latest/menus.html#permissions.
+- messagesRead : Lire vos messages électroniques.  
+  Utilisé pour lire le contenu d'un email existant dans la fenêtre de visualisation, voir https://webextension-api.thunderbird.net/en/latest/messages.html#permissions.
+- messagesTagsList : Lister les étiquettes de messages Thunderbird disponibles.  
+  Utilisé par la fonctionnalité Auto Tags pour récupérer les étiquettes existantes avant de demander à l'IA d'en choisir parmi elles, voir https://webextension-api.thunderbird.net/en/latest/messages.tags.html#permissions.
+- messagesUpdate : Modifier les propriétés et étiquettes des messages.  
+  Utilisé par la fonctionnalité Auto Tags pour appliquer les étiquettes sélectionnées par l'IA au message actuel, voir https://webextension-api.thunderbird.net/en/latest/messages.html#update-messageid-newproperties.
+- messagesModify : Lire et modifier vos messages électroniques tels qu'ils vous sont affichés.  
+  Utilisé pour modifier le contenu d'un email existant dans la fenêtre de visualisation, voir https://webextension-api.thunderbird.net/en/latest/messageDisplayScripts.html#permissions.
+- sensitiveDataUpload : Le contenu des emails est envoyé au fournisseur de services LLM sélectionné pour traitement, basé sur vos choix dans les paramètres de l'extension.
+- storage : Permet à l'extension de stocker et récupérer des données, et d'écouter les changements apportés aux éléments stockés.  
+  Utilisé pour stocker les paramètres utilisateur, voir https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/storage.
 
-## Localization
+## Localisation
 
-The add-on has a small set of messages that require localization. If you want to extend the translation, the process is straightforward:
+L'extension a un petit ensemble de messages qui nécessitent une localisation. Si vous souhaitez étendre la traduction, le processus est simple :
 
-1. Copy the file `src/locales/en-messages.json` to `src/locales/%ISO_CODE%-messages.json`, where `%ISO_CODE%` is your [ISO 639-1](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) language code.
-2. Translate your `src/locales/%ISO_CODE%-messages.json`, specifically the `message` properties, and remove the `description` properties, which are only used for context.
-3. Add a new line in the `package.json` file, matching the other `build:locales-*` entries and keeping them in alphabetical order:
+1. Copiez le fichier `src/locales/en-messages.json` vers `src/locales/%CODE_ISO%-messages.json`, où `%CODE_ISO%` est votre code de langue [ISO 639-1](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes).
+2. Traduisez votre `src/locales/%CODE_ISO%-messages.json`, spécifiquement les propriétés `message`, et supprimez les propriétés `description`, qui ne sont utilisées que pour le contexte.
+3. Ajoutez une nouvelle ligne dans le fichier `package.json`, correspondant aux autres entrées `build:locales-*` et en maintenant l'ordre alphabétique :
 
    ```json
-   "build:locales-%ISO_CODE%": "node_modules/.bin/json-minify src/locales/%ISO_CODE%-messages.json > ai-mail-support/_locales/%ISO_CODE%/messages.json",
+   "build:locales-%CODE_ISO%": "node_modules/.bin/json-minify src/locales/%CODE_ISO%-messages.json > ai-mail-support/_locales/%CODE_ISO%/messages.json",
    ```
-4. Add a corresponding entry to the `build:locales` script in `package.json`, again maintaining alphabetical order.
-5. Add the folder `%ISO_CODE%` to the `_locales` key in your `src/manifest.json`.
-6. Test your changes using the build process described in the [Build section](#build) and submit the changes in a pull request.
+4. Ajoutez une entrée correspondante au script `build:locales` dans `package.json`, en maintenant également l'ordre alphabétique.
+5. Ajoutez le dossier `%CODE_ISO%` à la clé `_locales` dans votre `src/manifest.json`.
+6. Testez vos changements en utilisant le processus de construction décrit dans la section [Construction](#construction) et soumettez les changements dans une pull request.
 
-## License and references
+## Licence et références
 
-### Project of Yellow Sakura
+### Projet de Yellow Sakura
 
-This project is based on the original work by Yellow Sakura, licensed under MIT.
+Ce projet est basé sur le travail original de Yellow Sakura, sous licence MIT.
 
-[MIT](https://opensource.org/licenses/MIT) by [Yellow Sakura](https://www.yellowsakura.com), [support@yellowsakura.com](mailto:support@yellowsakura.com), see the LICENSE file.  
-For more details, please refer to the [project page](https://www.yellowsakura.com/en/projects/ai-mail-support-for-thunderbird) and the link to the [official AMO (addons.mozilla.org) page](https://addons.thunderbird.net/en-GB/thunderbird/addon/ai-mail-support).
+[MIT](https://opensource.org/licenses/MIT) par [Yellow Sakura](https://www.yellowsakura.com), [support@yellowsakura.com](mailto:support@yellowsakura.com), voir le fichier LICENSE.  
+Pour plus de détails, veuillez vous référer à la [page du projet](https://www.yellowsakura.com/en/projects/ai-mail-support-for-thunderbird) et au lien vers la page officielle [AMO (addons.mozilla.org)](https://addons.thunderbird.net/en-GB/thunderbird/addon/ai-mail-support).
 
-### Project evolution and maintenance
+### Évolution et maintenance du projet
 
-Modifications and additional development:
+Modifications et développement supplémentaire :
 
 Copyright (c) 2026 Fabrice Simonet
 
-### Dependencies:
+### Dépendances :
 
-* [ESLint](https://github.com/eslint/eslint) is licensed under [MIT License](https://opensource.org/licenses/MIT);
-* [parcel](https://github.com/parcel-bundler/parcel) is licensed under [MIT License](https://opensource.org/licenses/MIT);
-* [posthtml](https://github.com/posthtml/posthtml) is licensed under [MIT License](https://opensource.org/licenses/MIT);
-* [remove-markdown](https://github.com/zuchka/remove-markdown) is licensed under [MIT License](https://opensource.org/licenses/MIT);
-* [types/sanitize-html](https://github.com/apostrophecms/sanitize-html) is licensed under [MIT License](https://opensource.org/licenses/MIT);
-* [types/thunderbird-webext-browser](https://www.npmjs.com/package/@types/thunderbird-webext-browser) is licensed under [MIT License](https://opensource.org/licenses/MIT);
-* [typescript-eslint/parser](https://github.com/typescript-eslint/typescript-eslint) is licensed under [BSD 2-clause license](https://opensource.org/license/bsd-2-clause).
+* [ESLint](https://github.com/eslint/eslint) est sous licence [MIT License](https://opensource.org/licenses/MIT) ;
+* [parcel](https://github.com/parcel-bundler/parcel) est sous licence [MIT License](https://opensource.org/licenses/MIT) ;
+* [posthtml](https://github.com/posthtml/posthtml) est sous licence [MIT License](https://opensource.org/licenses/MIT) ;
+* [remove-markdown](https://github.com/zuchka/remove-markdown) est sous licence [MIT License](https://opensource.org/licenses/MIT) ;
+* [types/sanitize-html](https://github.com/apostrophecms/sanitize-html) est sous licence [MIT License](https://opensource.org/licenses/MIT) ;
+* [types/thunderbird-webext-browser](https://www.npmjs.com/package/@types/thunderbird-webext-browser) est sous licence [MIT License](https://opensource.org/licenses/MIT) ;
+* [typescript-eslint/parser](https://github.com/typescript-eslint/typescript-eslint) est sous licence [BSD 2-clause license](https://opensource.org/license/bsd-2-clause).
 
-Images:
+Images :
 
-* Robots logo icons in `docs/bot-icon-*` were created by [Smashicons - Freepik](https://www.freepik.com/icon/bot_4712106)
+* Icônes de robots dans `docs/bot-icon-*` créées par [Smashicons - Freepik](https://www.freepik.com/icon/bot_4712106)
 
 CSS effects:
 
