@@ -37,6 +37,7 @@ export interface ConfigType {
     lms: {
         serviceUrl: string
         model: string
+        authToken: string
     }
 
     mistral: {

@@ -305,6 +305,12 @@
     "options.lms.serviceUrl.description": {
         "message": "È possibile eseguire LM Studio localmente (URL: <code>http://localhost:1234</code>), oppure su una macchina separata che è possibile raggiungere definendo il relativo URL od IP di destinazione."
     },
+    "options.lms.authToken": {
+        "message": "Token di autorizzazione"
+    },
+    "options.lms.authToken.description": {
+        "message": "Valore opzionale. Se presente, le richieste includono l'header <code>Authorization: Bearer &lt;token&gt;</code>."
+    },
     "options.lms.warningNoModel": {
          "message": "<strong>Attenzione</strong>: Nessun modello trovato in LM Studio, procedere all'installazione di un modello, es. Llama, come indicato sul <a href=\"https://lmstudio.ai/models\">sito ufficiale</a>."
     },

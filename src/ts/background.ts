@@ -632,7 +632,7 @@ messenger.menus.onClicked.addListener(async (info: messenger.menus.OnClickData) 
                 : textToBeProcessed
 
             const aiResponse = await llmProvider.suggestTagsForMessage(inputWithSubject, availableTags)
-            const suggestedTagKeys = extractSuggestedTagKeys(aiResponse, availableTags.map(tag => tag.key))
+            const suggestedTagKeys = extractSuggestedTagKeys(aiResponse, availableTags)
 
             const mergedTags = Array.from(new Set([...(displayedMessage.tags || []), ...suggestedTagKeys]))
 
@@ -937,17 +937,34 @@ async function updateMenuWithUserCustomPromptPreferences(): Promise<void> {
     }
 }
 
-function extractSuggestedTagKeys(rawResponse: string, allowedTagKeys: string[]): string[] {
+function extractSuggestedTagKeys(rawResponse: string, availableTags: { key: string; tag: string; color: string; ordinal: string }[]): string[] {
     const sanitizedResponse = rawResponse
         .replace(/^```json\s*/i, '')
         .replace(/^```\s*/i, '')
         .replace(/\s*```$/i, '')
         .trim()
 
+    const allowedTagKeys = availableTags.map((tag) => tag.key)
+    const allowedTagKeysSet = new Set(allowedTagKeys)
+    const normalizedKeyToKey = new Map<string, string>()
+    const normalizedLabelToKey = new Map<string, string>()
+
+    availableTags.forEach((tag) => {
+        const normalizedKey = normalizeComparableTagText(tag.key)
+        if(normalizedKey && !normalizedKeyToKey.has(normalizedKey)) {
+            normalizedKeyToKey.set(normalizedKey, tag.key)
+        }
+
+        const normalizedLabel = normalizeComparableTagText(tag.tag)
+        if(normalizedLabel && !normalizedLabelToKey.has(normalizedLabel)) {
+            normalizedLabelToKey.set(normalizedLabel, tag.key)
+        }
+    })
+
     let parsedResponse: { tags?: unknown }
 
     try {
-        parsedResponse = JSON.parse(sanitizedResponse)
+        parsedResponse = parseAutoTagsResponse(sanitizedResponse)
     } catch {
         throw new Error(browser.i18n.getMessage('errorAutoTagsInvalidResponse'))
     }
@@ -958,8 +975,63 @@ function extractSuggestedTagKeys(rawResponse: string, allowedTagKeys: string[]):
 
     return parsedResponse.tags
         .filter((tag): tag is string => typeof tag === 'string')
-        .map((tag) => tag.trim())
-        .filter((tag) => allowedTagKeys.includes(tag))
+        .map((tag) => normalizeSuggestedTagKey(tag))
+        .map((tag) => {
+            if(allowedTagKeysSet.has(tag)) {
+                return tag
+            }
+
+            const normalizedTag = normalizeComparableTagText(tag)
+            if(!normalizedTag) {
+                return ''
+            }
+
+            return normalizedKeyToKey.get(normalizedTag) || normalizedLabelToKey.get(normalizedTag) || ''
+        })
+        .filter((tag) => tag.length > 0)
         .filter((tag, index, tags) => tags.indexOf(tag) === index)
         .slice(0, 4)
+}
+
+function parseAutoTagsResponse(responseText: string): { tags?: unknown } {
+    let candidate = responseText.trim()
+
+    for(let index = 0; index < 3; index += 1) {
+        const parsedCandidate = JSON.parse(candidate)
+
+        if(typeof parsedCandidate === 'string') {
+            candidate = parsedCandidate.trim()
+            continue
+        }
+
+        if(parsedCandidate !== null && typeof parsedCandidate === 'object') {
+            return parsedCandidate as { tags?: unknown }
+        }
+
+        break
+    }
+
+    throw new Error(browser.i18n.getMessage('errorAutoTagsInvalidResponse'))
+}
+
+function normalizeSuggestedTagKey(tag: string): string {
+    return tag
+        .trim()
+        .replace(/^['"]+|['"]+$/g, '')
+        .replace(/\\(["'])/g, '$1')
+        .trim()
+}
+
+function normalizeComparableTagText(input: string): string {
+    return normalizeSuggestedTagKey(input)
+    .replace(/[\u0000-\u001F\u007F-\u009F]/g, '-')
+        .normalize('NFKD')
+        .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[‐‑‒–—―−]/g, '-')
+    .replace(/[^\p{L}\p{N}$_-]+/gu, '-')
+    .replace(/-+/g, '-')
+    .replace(/_+/g, '_')
+        .replace(/\s+/g, ' ')
+        .toLowerCase()
+        .trim()
 }

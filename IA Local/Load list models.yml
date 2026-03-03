@@ -1,0 +1,17 @@
+info:
+  name: Load list models
+  type: http
+  seq: 1
+
+http:
+  method: GET
+  url: ia.emulsion.io/api/v1/models
+  auth:
+    type: bearer
+    token: sk-lm-gqRVQfJa:wgIfvqXjVlSlnc0Z2q7o
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

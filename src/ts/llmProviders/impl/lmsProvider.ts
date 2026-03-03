@@ -10,12 +10,14 @@ import { getLanguageNameFromCode, logMessage } from '../../helpers/utils'
 export class LmsProvider extends GenericProvider {
     private readonly serviceUrl: string
     private readonly model: string
+    private readonly authToken: string
 
     public constructor(config: ConfigType) {
         super(config)
 
         this.serviceUrl = config.lms.serviceUrl
         this.model = config.lms.model
+        this.authToken = config.lms.authToken || ''
     }
 
     public async analyzeTextIntent(input: string): Promise<string> {
@@ -40,9 +42,16 @@ export class LmsProvider extends GenericProvider {
      * Returns an array of model IDs for all available LM Studio models in
      * the local installation.
      */
-    public static async getModels(serviceUrl: string): Promise<string[]> {
+    public static async getModels(serviceUrl: string, authToken: string = ''): Promise<string[]> {
+        const headers: Headers = new Headers()
+
+        if(authToken?.trim()) {
+            headers.append('Authorization', `Bearer ${authToken.trim()}`)
+        }
+
         const requestOptions: RequestInit = {
             method: 'GET',
+            headers: headers,
             redirect: 'follow'
         }
 
@@ -123,6 +132,10 @@ export class LmsProvider extends GenericProvider {
         const headers: Headers = new Headers()
         headers.append('Content-Type', 'application/json')
 
+        if(this.authToken.trim()) {
+            headers.append('Authorization', `Bearer ${this.authToken.trim()}`)
+        }
+
         const requestData = JSON.stringify({
             'model': this.model,
             'messages': [
@@ -140,8 +153,20 @@ export class LmsProvider extends GenericProvider {
             signal: signal
         }
 
-        const response = await fetch(`${this.serviceUrl}/v1/chat/completions`, requestOptions)
-        clearAbortSignalWithTimeout()
+        let response: Response
+        try {
+            response = await fetch(`${this.serviceUrl}/v1/chat/completions`, requestOptions)
+        } catch (error) {
+            const errorName = (error as { name?: string })?.name
+
+            if(errorName === 'AbortError') {
+                throw new Error(`LM Studio timeout: request exceeded ${this.servicesTimeout}s`)
+            }
+
+            throw error
+        } finally {
+            clearAbortSignalWithTimeout()
+        }
 
         if (!response.ok) {
             const errorResponse = await response.json()
@@ -149,6 +174,27 @@ export class LmsProvider extends GenericProvider {
         }
 
         const responseData = await response.json()
-        return responseData.choices[0].message.content
+        return this.extractAssistantMessage(responseData)
+    }
+
+    private extractAssistantMessage(responseData: any): string {
+        const openAiCompatibleContent = responseData?.choices?.[0]?.message?.content
+        if(typeof openAiCompatibleContent === 'string' && openAiCompatibleContent.trim().length > 0) {
+            return openAiCompatibleContent
+        }
+
+        if(Array.isArray(responseData?.output)) {
+            const outputMessage = responseData.output
+                .filter((entry: { type?: unknown; content?: unknown }) => entry?.type === 'message' && typeof entry?.content === 'string')
+                .map((entry: { content: string }) => entry.content)
+                .join('')
+                .trim()
+
+            if(outputMessage.length > 0) {
+                return outputMessage
+            }
+        }
+
+        throw new Error('LM Studio error: invalid response format')
     }
 }

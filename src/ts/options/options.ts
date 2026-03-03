@@ -159,7 +159,8 @@ document.querySelector('#optionsForm').addEventListener('submit', async (event) 
         },
         lms: {
             serviceUrl: document.querySelector<HTMLInputElement>('#lmsServiceUrl').value,
-            model: document.querySelector<HTMLInputElement>('#lmsModel').value
+            model: document.querySelector<HTMLInputElement>('#lmsModel').value,
+            authToken: document.querySelector<HTMLInputElement>('#lmsAuthToken').value
         },
         mistral: {
             apiKey: document.querySelector<HTMLInputElement>('#mistralApiKey').value,
@@ -262,6 +263,7 @@ document.addEventListener('DOMContentLoaded', async _ => {
     // LM Studio section -->
     document.querySelector<HTMLInputElement>('#lmsServiceUrl').value = configs.lms?.serviceUrl || 'http://localhost:1234'
     document.querySelector<HTMLInputElement>('#lmsModel').value = configs.lms?.model || ''
+    document.querySelector<HTMLInputElement>('#lmsAuthToken').value = configs.lms?.authToken || ''
     // <-- LM Studio section
 
     // Mistral AI section -->

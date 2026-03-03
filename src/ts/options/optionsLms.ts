@@ -26,11 +26,12 @@ document.querySelector('#lmsListModel').addEventListener('click', async _ => {
 
 async function getLmsLocalModels() {
     const selectLmsModel = document.querySelector<HTMLSelectElement>('#lmsModel')
+    const lmsConfig = await getConfig('lms')
 
     // The last selected model or the one previously saved in the options
     // is retrieved, and then all models are removed from the list to
     // ensure that the newly read models completely replace the old list.
-    const selectedValue = selectLmsModel.value || (await getConfig('lms'))?.model
+    const selectedValue = selectLmsModel.value || lmsConfig?.model
     selectLmsModel.innerHTML = ''
 
     // Removal of any previously displayed API error message
@@ -41,7 +42,8 @@ async function getLmsLocalModels() {
     document.querySelector('#lms .description.lms-warning-no-model').classList.remove('show')
 
     try {
-        const lmsLocalModels = await LmsProvider.getModels(document.querySelector<HTMLSelectElement>('#lmsServiceUrl').value)
+        const lmsAuthToken = document.querySelector<HTMLInputElement>('#lmsAuthToken').value || lmsConfig?.authToken
+        const lmsLocalModels = await LmsProvider.getModels(document.querySelector<HTMLSelectElement>('#lmsServiceUrl').value, lmsAuthToken)
 
         if (lmsLocalModels.length != 0) {
             // Sort the array

@@ -401,6 +401,14 @@
         "message": "LM Studio peut être exécuté localement (URL : <code>http://localhost:1234</code>), ou sur une machine séparée accessible en spécifiant l'URL ou l'adresse IP cible.",
         "description": "Description expliquant l'URL cible pour invoquer les services LM Studio."
     },
+    "options.lms.authToken": {
+        "message": "Jeton d'autorisation",
+        "description": "Jeton bearer facultatif utilisé pour authentifier les requêtes vers les API LM Studio."
+    },
+    "options.lms.authToken.description": {
+        "message": "Valeur facultative. Si renseignée, les requêtes incluent l'en-tête <code>Authorization: Bearer &lt;token&gt;</code>.",
+        "description": "Texte d'aide pour le champ facultatif de jeton d'autorisation LM Studio."
+    },
     "options.lms.warningNoModel": {
         "message": "<strong>Attention</strong> : Aucun modèle trouvé dans LM Studio, veuillez procéder à l'installation d'un modèle, par exemple Llama, comme indiqué sur le <a href=\"https://lmstudio.ai/models\">site officiel</a>.",
         "description": "Message affiché lorsqu'aucun modèle LLM utilisable n'est identifié dans LM Studio."
