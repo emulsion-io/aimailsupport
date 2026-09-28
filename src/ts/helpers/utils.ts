@@ -1,5 +1,7 @@
 import { ConfigType } from './configType'
 import { mask } from '@yellowsakura/js-pii-mask'
+// Loaded as an unmodified vendor script by options.html for add-on review.
+declare const DOMPurify: typeof import('dompurify')
 
 /**
  * Retrieve data from browser storage for a specific key.
@@ -173,7 +175,7 @@ export function getLanguageNameFromCode(languageCode: string, locale: string = '
  * Localizes HTML nodes with the 'data-l10n-ref' attribute.
  *
  * This function searches for all HTML nodes with the 'data-l10n-ref' attribute and
- * sets their inner HTML with the corresponding localized message obtained from the
+ * inserts sanitized content from the corresponding localized message obtained from the
  * internationalization message management module.
  *
  * @returns {void}
@@ -181,7 +183,13 @@ export function getLanguageNameFromCode(languageCode: string, locale: string = '
 export function localizeNodes(): void {
     document.querySelectorAll('[data-l10n-ref]').forEach((node: Element) => {
         const l10nRef = node.getAttribute('data-l10n-ref')
-        node.innerHTML = messenger.i18n.getMessage(l10nRef)
+        node.replaceChildren(DOMPurify.sanitize(messenger.i18n.getMessage(l10nRef), {
+            ALLOWED_TAGS: ['a', 'b', 'strong', 'br', 'p', 'span', 'code'],
+            ALLOWED_ATTR: ['href', 'class'],
+            ALLOW_DATA_ATTR: false,
+            ALLOW_ARIA_ATTR: false,
+            RETURN_DOM_FRAGMENT: true
+        }))
     })
 }
 

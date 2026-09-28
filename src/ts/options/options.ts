@@ -104,10 +104,10 @@ document.querySelector('#optionsForm button.test').addEventListener('click', asy
 
     llmProvider.testIntegration().then(() => {
         document.querySelector('#optionsForm #testResult').classList.add('ok')
-        document.querySelector('#optionsForm #testResult .message').innerHTML = browser.i18n.getMessage('options.testSuccessful')
+        document.querySelector('#optionsForm #testResult .message').textContent = browser.i18n.getMessage('options.testSuccessful')
     }).catch(error => {
         document.querySelector('#optionsForm #testResult').classList.add('ko')
-        document.querySelector('#optionsForm #testResult .message').innerHTML = error.message
+        document.querySelector('#optionsForm #testResult .message').textContent = error.message
     }).finally(() => {
         document.querySelector<HTMLButtonElement>('#optionsForm button.test').classList.remove('testing')
     })
@@ -360,20 +360,25 @@ function appendCustomPromptItem(customPrompt: CustomPrompt = { title: '', prompt
 
     item.innerHTML = `
         <div class="form-group">
-            <label>${browser.i18n.getMessage('options.customPrompts.title')}</label>
-            <input type="text" class="custom-prompt-title" maxlength="80" value="${escapeHtml(customPrompt.title)}">
+            <label data-l10n-ref="options.customPrompts.title"></label>
+            <input type="text" class="custom-prompt-title" maxlength="80">
         </div>
         <div class="form-group custom-prompt-textarea-group">
-            <label>${browser.i18n.getMessage('options.customPrompts.prompt')}</label>
-            <textarea class="custom-prompt-value" rows="3">${escapeHtml(customPrompt.prompt)}</textarea>
+            <label data-l10n-ref="options.customPrompts.prompt"></label>
+            <textarea class="custom-prompt-value" rows="3"></textarea>
         </div>
         <div class="custom-prompt-buttons">
-            <button type="button" class="custom-prompt-up">${browser.i18n.getMessage('options.customPrompts.up')}</button>
-            <button type="button" class="custom-prompt-down">${browser.i18n.getMessage('options.customPrompts.down')}</button>
-            <button type="button" class="custom-prompt-delete">${browser.i18n.getMessage('options.customPrompts.remove')}</button>
+            <button type="button" class="custom-prompt-up" data-l10n-ref="options.customPrompts.up"></button>
+            <button type="button" class="custom-prompt-down" data-l10n-ref="options.customPrompts.down"></button>
+            <button type="button" class="custom-prompt-delete" data-l10n-ref="options.customPrompts.remove"></button>
         </div>
     `
 
+    item.querySelector<HTMLInputElement>('.custom-prompt-title').value = customPrompt.title
+    item.querySelector<HTMLTextAreaElement>('.custom-prompt-value').value = customPrompt.prompt
+    item.querySelectorAll('[data-l10n-ref]').forEach(node => {
+        node.textContent = browser.i18n.getMessage(node.getAttribute('data-l10n-ref'))
+    })
     customPromptsList.appendChild(item)
 }
 
@@ -394,13 +399,4 @@ function getCustomPromptsFromDOM(): CustomPrompt[] {
             return { title, prompt }
         })
         .filter((customPrompt) => customPrompt.title.length > 0 && customPrompt.prompt.length > 0)
-}
-
-function escapeHtml(value: string): string {
-    return value
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;')
-        .replaceAll("'", '&#039;')
 }

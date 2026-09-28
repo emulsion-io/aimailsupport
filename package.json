@@ -15,7 +15,7 @@
     "build:promptDisplay": "npm run build:promptDisplay:ts && npm run build:promptDisplay:sass",
     "build:promptDisplay:ts": "parcel build src/ts/promptDisplay.ts --dist-dir ai-mail-support/promptDisplay --no-source-maps --no-content-hash --no-cache",
     "build:promptDisplay:sass": "parcel build src/sass/promptDisplay.scss --dist-dir ai-mail-support/promptDisplay --no-source-maps --no-content-hash --no-cache",
-    "build:options": "parcel build src/html/options.html --dist-dir ai-mail-support/options --public-url /options/ --no-source-maps --no-content-hash --no-cache",
+    "build:options": "parcel build src/html/options.html --dist-dir ai-mail-support/options --public-url /options/ --no-source-maps --no-content-hash --no-cache && node scripts/copy-vendor.cjs",
     "build": "npm run build:icons && npm run build:manifest && npm run build:locales && npm run build:addon",
     "build:package": "npm run build && cd ai-mail-support && zip -r -FS ../ai-mail-support.xpi * --exclude '*.DS_Store*'",
     "package": "node scripts/package.js",
@@ -34,6 +34,7 @@
     "dotenv": "^17.0",
     "eslint": "^9.27.0",
     "jest": "^30.0",
+    "jest-environment-jsdom": "^30.5.2",
     "jest-webextension-mock": "^4.0",
     "json-minify": "^1.0.0",
     "parcel": "^2.16",
@@ -44,6 +45,7 @@
   },
   "dependencies": {
     "@yellowsakura/js-pii-mask": "0.8.93",
+    "dompurify": "^3.4.16",
     "remove-markdown": "^0.6.2"
   }
 }

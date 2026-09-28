@@ -4,7 +4,7 @@ const archiver = require('archiver');
 
 const sourceDir = path.join(__dirname, '..', 'ai-mail-support');
 const outputDir = path.join(__dirname, '..', 'dist');
-const outputFile = path.join(outputDir, 'ai-mail-extended.xpi');
+const outputFile = path.join(outputDir, process.argv[2] ? path.basename(process.argv[2]) : 'ai-mail-extended.xpi');
 
 // Créer le dossier dist si nécessaire
 if (!fs.existsSync(outputDir)) {
@@ -13,6 +13,10 @@ if (!fs.existsSync(outputDir)) {
 
 // Créer le stream de sortie
 const output = fs.createWriteStream(outputFile);
+output.on('error', (err) => {
+    console.error(`Unable to write package: ${err.message}`);
+    process.exitCode = 1;
+});
 const archive = archiver('zip', {
     zlib: { level: 9 } // Compression maximale
 });

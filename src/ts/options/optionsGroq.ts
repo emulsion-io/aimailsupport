@@ -58,6 +58,6 @@ async function getGroqModels() {
     }
     catch (error) {
         document.querySelector('#groq .description.groq-error-api').classList.add('show')
-        document.querySelector('#groq .description.groq-error-api').innerHTML = error.message
+        document.querySelector('#groq .description.groq-error-api').textContent = error.message
     }
 }
