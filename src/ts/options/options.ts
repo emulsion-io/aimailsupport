@@ -160,7 +160,8 @@ document.querySelector('#optionsForm').addEventListener('submit', async (event) 
         lms: {
             serviceUrl: document.querySelector<HTMLInputElement>('#lmsServiceUrl').value,
             model: document.querySelector<HTMLInputElement>('#lmsModel').value,
-            authToken: document.querySelector<HTMLInputElement>('#lmsAuthToken').value
+            authToken: document.querySelector<HTMLInputElement>('#lmsAuthToken').value.trim(),
+            disableThinking: document.querySelector<HTMLInputElement>('#lmsDisableThinking').checked
         },
         mistral: {
             apiKey: document.querySelector<HTMLInputElement>('#mistralApiKey').value,
@@ -264,6 +265,7 @@ document.addEventListener('DOMContentLoaded', async _ => {
     document.querySelector<HTMLInputElement>('#lmsServiceUrl').value = configs.lms?.serviceUrl || 'http://localhost:1234'
     document.querySelector<HTMLInputElement>('#lmsModel').value = configs.lms?.model || ''
     document.querySelector<HTMLInputElement>('#lmsAuthToken').value = configs.lms?.authToken || ''
+    document.querySelector<HTMLInputElement>('#lmsDisableThinking').checked = configs.lms?.disableThinking === true
     // <-- LM Studio section
 
     // Mistral AI section -->

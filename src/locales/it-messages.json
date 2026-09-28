@@ -305,6 +305,12 @@
     "options.lms.serviceUrl.description": {
         "message": "È possibile eseguire LM Studio localmente (URL: <code>http://localhost:1234</code>), oppure su una macchina separata che è possibile raggiungere definendo il relativo URL od IP di destinazione."
     },
+    "options.lms.disableThinking": {
+        "message": "Disattiva la modalità thinking"
+    },
+    "options.lms.disableThinking.description": {
+        "message": "Facoltativo. Richiede LM Studio 0.4 o successivo e un modello che consenta di disattivare il ragionamento. Se non selezionato, viene mantenuta la modalità predefinita del modello."
+    },
     "options.lms.authToken": {
         "message": "Token di autorizzazione"
     },

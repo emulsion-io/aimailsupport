@@ -37,7 +37,8 @@ export interface ConfigType {
     lms: {
         serviceUrl: string
         model: string
-        authToken: string
+        authToken?: string
+        disableThinking?: boolean
     }
 
     mistral: {

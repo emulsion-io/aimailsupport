@@ -96,6 +96,14 @@ Whether in the email viewing or composition window, you can always enable the cu
 
 <p align="center" width="100%"><img alt="Custom prompt" src="docs/screen/screen-custom-prompt.png"></p>
 
+### LM Studio options
+
+In the LM Studio settings, the **connection token is optional**: enter the raw token (without the `Bearer` prefix) if your server requires authentication, otherwise leave it empty. It is used for both model listing and AI requests.
+
+The **Disable thinking mode** checkbox is unchecked by default. When checked, requests use `/api/v1/chat` with `reasoning: "off"` and `store: false`. This requires **LM Studio 0.4 or newer** and a model that supports disabling reasoning. Otherwise, the server may reject the request: uncheck this option. When unchecked, the existing `/v1/chat/completions` requests are preserved.
+
+Save the settings before testing the connection.
+
 ### Owl for Exchange bug
 
 If you use the [Owl for Exchange](https://addons.thunderbird.net/en-us/thunderbird/addon/owl-for-exchange) add-on to manage Exchange or Office365 accounts, ⚠️ **there is a known bug** that interferes with the [scripting.messageDisplay API](https://webextension-api.thunderbird.net/en/mv3/scripting.messageDisplay.html) and will prevent AI Mail Support for Thunderbird from functioning correctly when previewing an email.

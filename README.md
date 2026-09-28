@@ -96,6 +96,14 @@ Que ce soit dans la fenêtre de visualisation ou de composition d'email, vous po
 
 <p align="center" width="100%"><img alt="Prompt personnalisé" src="docs/screen/screen-custom-prompt.png"></p>
 
+### Options LM Studio
+
+Dans les paramètres LM Studio, le **token de connexion est facultatif** : renseignez le token brut (sans le préfixe `Bearer`) si votre serveur exige une authentification, sinon laissez le champ vide. Il est utilisé pour la liste des modèles et les traitements IA.
+
+La case **Désactiver le mode thinking**, décochée par défaut, envoie `reasoning: "off"` via `/api/v1/chat`, sans enregistrer la conversation côté serveur (`store: false`). Elle nécessite **LM Studio 0.4 ou plus récent** et un modèle acceptant la désactivation du raisonnement. Sinon, le serveur peut refuser la requête : décochez cette option. Lorsque la case est décochée, les appels habituels à `/v1/chat/completions` sont conservés.
+
+Enregistrez les paramètres avant de tester la connexion.
+
 ### Bug Owl for Exchange
 
 Si vous utilisez l'extension [Owl for Exchange](https://addons.thunderbird.net/en-us/thunderbird/addon/owl-for-exchange) pour gérer des comptes Exchange ou Office365, ⚠️ **il y a un bug connu** qui interfère avec l'[API scripting.messageDisplay](https://webextension-api.thunderbird.net/en/mv3/scripting.messageDisplay.html) et empêchera AI Mail Support for Thunderbird de fonctionner correctement lors de l'aperçu d'un email.

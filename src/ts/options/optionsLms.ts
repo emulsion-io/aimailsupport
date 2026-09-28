@@ -6,7 +6,7 @@ import { LmsProvider } from '../llmProviders/impl/lmsProvider'
 // Check if the currently used LLM provider is LM Studio, and if so, load the
 // available local models.
 if((await getConfig('llmProvider')) == 'lms') {
-    getLmsLocalModels()
+    getLmsLocalModels(true)
 }
 
 // The LLM provider change event is handled to reload all available LM Studio
@@ -24,7 +24,7 @@ document.querySelector('#lmsListModel').addEventListener('click', async _ => {
     getLmsLocalModels()
 })
 
-async function getLmsLocalModels() {
+async function getLmsLocalModels(useSavedConfig = false) {
     const selectLmsModel = document.querySelector<HTMLSelectElement>('#lmsModel')
     const lmsConfig = await getConfig('lms')
 
@@ -42,8 +42,9 @@ async function getLmsLocalModels() {
     document.querySelector('#lms .description.lms-warning-no-model').classList.remove('show')
 
     try {
-        const lmsAuthToken = document.querySelector<HTMLInputElement>('#lmsAuthToken').value || lmsConfig?.authToken
-        const lmsLocalModels = await LmsProvider.getModels(document.querySelector<HTMLSelectElement>('#lmsServiceUrl').value, lmsAuthToken)
+        const lmsAuthToken = useSavedConfig ? lmsConfig?.authToken : document.querySelector<HTMLInputElement>('#lmsAuthToken').value
+        const serviceUrl = useSavedConfig ? (lmsConfig?.serviceUrl || 'http://localhost:1234') : document.querySelector<HTMLInputElement>('#lmsServiceUrl').value
+        const lmsLocalModels = await LmsProvider.getModels(serviceUrl, lmsAuthToken)
 
         if (lmsLocalModels.length != 0) {
             // Sort the array

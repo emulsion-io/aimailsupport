@@ -11,6 +11,7 @@ export class LmsProvider extends GenericProvider {
     private readonly serviceUrl: string
     private readonly model: string
     private readonly authToken: string
+    private readonly disableThinking: boolean
 
     public constructor(config: ConfigType) {
         super(config)
@@ -18,6 +19,7 @@ export class LmsProvider extends GenericProvider {
         this.serviceUrl = config.lms.serviceUrl
         this.model = config.lms.model
         this.authToken = config.lms.authToken || ''
+        this.disableThinking = config.lms.disableThinking === true
     }
 
     public async analyzeTextIntent(input: string): Promise<string> {
@@ -136,7 +138,16 @@ export class LmsProvider extends GenericProvider {
             headers.append('Authorization', `Bearer ${this.authToken.trim()}`)
         }
 
-        const requestData = JSON.stringify({
+        // The native API exposes explicit reasoning control (LM Studio 0.4+).
+        const endpoint = this.disableThinking ? '/api/v1/chat' : '/v1/chat/completions'
+        const requestData = JSON.stringify(this.disableThinking ? {
+            model: this.model,
+            system_prompt: systemInput,
+            input: userInput,
+            temperature: this.temperature,
+            reasoning: 'off',
+            store: false
+        } : {
             'model': this.model,
             'messages': [
                 { 'role': 'system', 'content': systemInput },
@@ -155,7 +166,7 @@ export class LmsProvider extends GenericProvider {
 
         let response: Response
         try {
-            response = await fetch(`${this.serviceUrl}/v1/chat/completions`, requestOptions)
+            response = await fetch(`${this.serviceUrl}${endpoint}`, requestOptions)
         } catch (error) {
             const errorName = (error as { name?: string })?.name
 
@@ -170,7 +181,7 @@ export class LmsProvider extends GenericProvider {
 
         if (!response.ok) {
             const errorResponse = await response.json()
-            throw new Error(`LM Studio error: ${errorResponse.error}`)
+            throw new Error(`LM Studio error: ${errorResponse.error?.message || errorResponse.error}`)
         }
 
         const responseData = await response.json()

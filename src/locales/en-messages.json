@@ -401,6 +401,12 @@
         "message": "LM Studio can be run locally (URL: <code>http://localhost:1234</code>), or on a separate machine that can be accessed by specifying the target URL or IP address.",
         "description": "Description explaining the target URL for invoking LM Studio services."
     },
+    "options.lms.disableThinking": {
+        "message": "Disable thinking mode"
+    },
+    "options.lms.disableThinking.description": {
+        "message": "Optional. Requires LM Studio 0.4 or newer and a model that supports disabling reasoning. When unchecked, the model default is used."
+    },
     "options.lms.authToken": {
         "message": "Authorization token",
         "description": "Optional bearer token used to authenticate requests to LM Studio APIs."
