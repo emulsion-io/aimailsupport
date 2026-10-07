@@ -29,16 +29,20 @@
                     <option disabled selected data-l10n-ref=options.llmProvider.default></option>
                     <option value=anthropic>Anthropic Claude</option>
                     <option value=google>Google Gemini</option>
-                    <option value=groq>Groq cloud (Gemma, Llama, Mistral)</option>
+                    <option value=groq>Groq cloud (Gemma, Llama, Mistral, …)</option>
                     <option value=deepseek>Hangzhou DeepSeek AI</option>
-                    <option value=lms>LM Studio (Gemma, Llama, Mistral, Phi, StarCoder, …)</option>
+                    <option value=lms>LM Studio (Gemma, GLM, Mistral, …)</option>
                     <option value=mistral>Mistral</option>
-                    <option value=ollama>Ollama (Gemma, Llama, Mistral, Phi, …)</option>
+                    <option value=ollama>Ollama (Gemma, GLM, Mistral, …)</option>
+                    <option value=openaicompatible>OpenAI API compatible (llama.cpp, vLLM, …)</option>
                     <option value=openai>OpenAI GPT</option>
+                    <option value=openrouter>OpenRouter (Claude, GPT, Gemini, …)</option>
                     <option value=xai>xAI Grok</option>
+                    <option value=vllm>vLLM (Gemma, GLM, Mistral, …)</option>
                 </select>
 
                 <div class=description data-l10n-ref=options.llmProvider.description></div>
+                <div class=description data-l10n-ref=options.llmProvider.dataDisclosure></div>
             </div>
 
             <div class=form-group>
@@ -46,13 +50,21 @@
                 <input id=llmTemperature data-required type=range min=0 max=2 value=1 step=0.25>
 
                 <div class=description data-l10n-ref=options.llmTemperature.description></div>
+                <div class="description local-llm-warning-no-temperature" data-l10n-ref=options.llmTemperature.noTemperatureDescription></div>
             </div>
 
             <div class=form-group>
                 <label for=servicesTimeout data-l10n-ref=options.servicesTimeout>&nbsp;</label>
-                <input type=number id=servicesTimeout min=5 max=80 step=1 data-required>
+                <input type=number id=servicesTimeout min=5 max=120 step=1 data-required>
 
                 <div class="description local-llm-warning-timeout" data-l10n-ref=localLlm.warningTimeout></div>
+            </div>
+
+            <div class=form-group>
+                <label for=streamResponses data-l10n-ref=options.streamResponses>&nbsp;</label>
+                <input type=checkbox id=streamResponses>
+
+                <div class=description data-l10n-ref=options.streamResponses.description></div>
             </div>
 
             <div class=form-group>
@@ -60,6 +72,7 @@
                 <input type=checkbox id=maskPii>
 
                 <div class=description data-l10n-ref=options.maskPii.description></div>
+
             </div>
 
             <div class=form-group>
@@ -90,7 +103,7 @@
                 </div>
             </fieldset>
 
-            
+
             <fieldset id=anthropic>
     <legend>Anthropic Claude:</legend>
 
@@ -100,18 +113,24 @@
         <div class=description data-l10n-ref=options.anthropic.apiKey.description></div>
     </div>
 
-    
+
     <div class=form-group>
         <label for=anthropicModel data-l10n-ref=options.anthropic.model>&nbsp;</label>
         <select id=anthropicModel data-required>
-            <option value=claude-sonnet-4-5>Claude 4.5 Sonnet</option>
-            <option selected value=claude-haiku-4-5>Claude Haiku 4.5</option>
+            <option value=claude-fable-5-1 data-no-temperature=true>Fable 5.1</option>
+            <option value=claude-fable-5 data-no-temperature=true>Fable 5</option>
+            <option value=claude-opus-5-5 data-no-temperature=true>Opus 5.5</option>
+            <option value=claude-opus-4-8 data-no-temperature=true>Opus 4.8</option>
+            <option selected value=claude-sonnet-5-5 data-no-temperature=true>Sonnet 5.5</option>
+            <option value=claude-sonnet-5 data-no-temperature=true>Sonnet 5</option>
+            <option value=claude-haiku-4-5>Haiku 4.5</option>
+        <option value=claude-sonnet-4-5>Claude 4.5 Sonnet</option>
             <option value=claude-opus-4-5>Claude 4.5 Opus</option>
         </select>
     </div>
 </fieldset>
 
-            
+
             <fieldset id=deepseek>
     <legend>DeepSeek:</legend>
 
@@ -120,9 +139,19 @@
         <input id=deepseekApiKey is=password-toggle data-required>
         <div class=description data-l10n-ref=options.deepseek.apiKey.description></div>
     </div>
+
+
+    <div class=form-group>
+        <label for=deepseekModel data-l10n-ref=options.deepseek.model>&nbsp;</label>
+        <select id=deepseekModel data-required>
+            <option value=deepseek-v4-pro>DeepSeek V4 Pro</option>
+            <option selected value=deepseek-flash>DeepSeek V4.1 Flash</option>
+            <option value=deepseek-chat>DeepSeek Chat</option>
+        </select>
+    </div>
 </fieldset>
 
-            
+
             <fieldset id=google>
     <legend>Google Gemini:</legend>
 
@@ -132,20 +161,35 @@
         <div class=description data-l10n-ref=options.google.apiKey.description></div>
     </div>
 
-    
+
     <div class=form-group>
         <label for=googleModel data-l10n-ref=options.google.model>&nbsp;</label>
         <select id=googleModel data-required>
-            <option value=gemini-3-pro-preview>Gemini 3 Pro</option>
-            <option value=gemini-3-flash-preview>Gemini 3 Flash</option>
-            <option value=gemini-2.5-pro>Gemini 2.5 Pro</option>
-            <option selected value=gemini-2.5-flash>Gemini 2.5 Flash</option>
-            <option value=gemini-2.5-flash-lite>Gemini 2.5 Flash Lite</option>
+            <option value=gemini-3.8-flash>Gemini 3.8 Flash</option>
+            <option value=gemini-3.7-flash>Gemini 3.7 Flash</option>
+            <option value=gemini-3.6-flash>Gemini 3.6 Flash</option>
+            <option value=gemini-3.5-flash>Gemini 3.5 Flash</option>
+            <option selected value=gemini-3.5-flash-lite>Gemini 3.5 Flash Lite</option>
+            <option value=gemini-3.1-pro>Gemini 3.1 Pro</option>
         </select>
+    </div>
+
+
+    <div class=form-group>
+        <label for=googleReasoningEffort data-l10n-ref=options.google.reasoningEffort>&nbsp;</label>
+        <select id=googleReasoningEffort data-required>
+            <option selected value=default data-l10n-ref=options.reasoning.default></option>
+            <option value=off data-l10n-ref=options.google.reasoningEffort.off></option>
+            <option value=low data-l10n-ref=options.google.reasoningEffort.low></option>
+            <option value=medium data-l10n-ref=options.google.reasoningEffort.medium></option>
+            <option value=high data-l10n-ref=options.google.reasoningEffort.high></option>
+        </select>
+        <div class=description data-l10n-ref=options.google.reasoningEffort.description></div>
     </div>
 </fieldset>
 
-            
+
+
             <fieldset id=groq>
     <legend>Groq cloud:</legend>
 
@@ -155,7 +199,7 @@
         <div class=description data-l10n-ref=options.groq.apiKey.description></div>
     </div>
 
-    
+
     <div class=form-group>
         <label for=groqModel data-l10n-ref=options.groq.model>&nbsp;</label>
         <select id=groqModel data-required></select>
@@ -165,11 +209,11 @@
     </div>
 </fieldset>
 
-            
+
             <fieldset id=lms>
     <legend>LM Studio:</legend>
 
-    
+
     <div class=form-group>
         <div class=full-description data-l10n-ref=options.lms.description></div>
     </div>
@@ -202,7 +246,7 @@
 </fieldset>
 
 
-            
+
             <fieldset id=mistral>
     <legend>Mistral AI:</legend>
 
@@ -212,7 +256,7 @@
         <div class=description data-l10n-ref=options.mistral.apiKey.description></div>
     </div>
 
-    
+
     <div class=form-group>
         <label for=mistralModel data-l10n-ref=options.mistral.model>&nbsp;</label>
         <select id=mistralModel data-required>
@@ -223,11 +267,11 @@
     </div>
 </fieldset>
 
-            
+
             <fieldset id=ollama>
     <legend>Ollama:</legend>
 
-    
+
     <div class=form-group>
         <div class=full-description data-l10n-ref=options.ollama.description></div>
     </div>
@@ -246,9 +290,23 @@
         <div class="description ollama-error-api" data-l10n-ref=options.ollama.errorApi></div>
         <div class="description ollama-warning-no-model" data-l10n-ref=options.ollama.warningNoModel></div>
     </div>
+
+    <div class=form-group>
+        <label for=ollamaReasoningEffort data-l10n-ref=options.ollama.reasoningEffort>&nbsp;</label>
+        <select id=ollamaReasoningEffort data-required>
+            <option selected value=default data-l10n-ref=options.ollama.reasoningEffort.default></option>
+            <option value=none data-l10n-ref=options.ollama.reasoningEffort.none></option>
+            <option value=low data-l10n-ref=options.ollama.reasoningEffort.low></option>
+            <option value=medium data-l10n-ref=options.ollama.reasoningEffort.medium></option>
+            <option value=high data-l10n-ref=options.ollama.reasoningEffort.high></option>
+            <option value=max data-l10n-ref=options.ollama.reasoningEffort.max></option>
+        </select>
+        <div class=description data-l10n-ref=options.ollama.reasoningEffort.description></div>
+    </div>
 </fieldset>
 
-            
+
+
             <fieldset id=openai>
     <legend>OpenAI GPT:</legend>
 
@@ -264,17 +322,25 @@
         <div class=description data-l10n-ref=options.openai.organizationId.description></div>
     </div>
 
-    
+
     <div class=form-group>
         <label for=openaiModel data-l10n-ref=options.openai.model>&nbsp;</label>
         <select id=openaiModel data-required>
-            <option value=gpt-5.2>GPT-5.2</option>
-            <option value=gpt-4.1>GPT-4.1</option>
-            <option selected value=gpt-4.1-mini>GPT-4.1 mini</option>
+            <option value=gpt-6-astra data-no-temperature=true>GPT-6 Astra</option>
+            <option value=gpt-6.1-sol data-no-temperature=true>GPT-6.1 Sol</option>
+            <option value=gpt-5.6-sol data-no-temperature=true>GPT-5.6 Sol</option>
+            <option value=gpt-5.6-terra data-no-temperature=true>GPT-5.6 Terra</option>
+            <option value=gpt-6-luna data-no-temperature=true>GPT-6 Luna</option>
+            <option value=gpt-5.6-luna data-no-temperature=true>GPT-5.6 Luna</option>
+            <option value=gpt-5.5 data-no-temperature=true>GPT-5.5</option>
+            <option value=gpt-5.4>GPT-5.4</option>
+            <option selected value=gpt-5.2>GPT-5.2</option>
+        <option value=gpt-4.1>GPT-4.1</option>
+            <option value=gpt-4.1-mini>GPT-4.1 mini</option>
         </select>
     </div>
 
-    
+
     <fieldset class=light>
         <legend data-l10n-ref=options.openai.text2speech></legend>
 
@@ -315,7 +381,59 @@
     </fieldset>
 </fieldset>
 
-            
+
+            <fieldset id=openaicompatible>
+    <legend>OpenAI API compatible:</legend>
+
+    <div class=form-group>
+        <div class=full-description data-l10n-ref=options.openaicompatible.description></div>
+    </div>
+
+    <div class=form-group>
+        <label for=openaicompatibleServiceUrl data-l10n-ref=options.openaicompatible.serviceUrl>&nbsp;</label>
+        <input id=openaicompatibleServiceUrl type=url placeholder=http://localhost:9931 data-required>
+        <div class=description data-l10n-ref=options.openaicompatible.serviceUrl.description></div>
+    </div>
+
+    <div class=form-group>
+        <label for=openaicompatibleApiKey data-l10n-ref=options.openaicompatible.apiKey>&nbsp;</label>
+        <input id=openaicompatibleApiKey is=password-toggle>
+        <div class=description data-l10n-ref=options.openaicompatible.apiKey.description></div>
+    </div>
+
+    <div class=form-group>
+        <label for=openaicompatibleModel data-l10n-ref=options.openaicompatible.model>&nbsp;</label>
+        <select id=openaicompatibleModel data-required></select>
+        <button id=openaicompatibleListModel type=button data-l10n-ref=options.openaicompatible.listModelsButton>&nbsp;</button>
+
+        <div class="description openaicompatible-error-api" data-l10n-ref=options.openaicompatible.errorApi></div>
+        <div class="description openaicompatible-warning-no-model" data-l10n-ref=options.openaicompatible.warningNoModel></div>
+    </div>
+</fieldset>
+
+
+
+            <fieldset id=openrouter>
+    <legend>OpenRouter:</legend>
+
+    <div class=form-group>
+        <label for=openrouterApiKey data-l10n-ref=options.openrouter.apiKey>&nbsp;</label>
+        <input id=openrouterApiKey is=password-toggle data-required>
+        <div class=description data-l10n-ref=options.openrouter.apiKey.description></div>
+    </div>
+
+
+    <div class=form-group>
+        <label for=openrouterModel data-l10n-ref=options.openrouter.model>&nbsp;</label>
+        <select id=openrouterModel data-required></select>
+        <button id=openrouterListModel data-l10n-ref=options.openrouter.listModelsButton>&nbsp;</button>
+
+        <div class="description openrouter-error-api"></div>
+    </div>
+</fieldset>
+
+
+
             <fieldset id=xai>
     <legend>xAI Grok:</legend>
 
@@ -325,18 +443,53 @@
         <div class=description data-l10n-ref=options.xai.apiKey.description></div>
     </div>
 
-    
+
     <div class=form-group>
         <label for=xaiModel data-l10n-ref=options.xai.model>&nbsp;</label>
         <select id=xaiModel data-required>
-            <option value=grok-4-1-fast-reasoning>Grok 4.1 Fast (Reasoning)</option>
+            <option value=grok-4.7>Grok 4.7</option>
+            <option value=grok-4.6>Grok 4.6</option>
+            <option value=grok-4.5>Grok 4.5</option>
+            <option selected value=grok-4.3>Grok 4.3</option>
+        <option value=grok-4-1-fast-reasoning>Grok 4.1 Fast (Reasoning)</option>
             <option value=grok-4-1-fast-non-reasoning>Grok 4.1 Fast (Non-Reasoning)</option>
             <option value=grok-4-latest>Grok 4</option>
             <option value=grok-3-latest>Grok 3</option>
-            <option selected value=grok-3-mini-latest>Grok 3 Mini</option>
+            <option value=grok-3-mini-latest>Grok 3 Mini</option>
         </select>
     </div>
 </fieldset>
+
+
+            <fieldset id=vllm>
+    <legend>vLLM:</legend>
+
+    <div class=form-group>
+        <div class=full-description data-l10n-ref=options.vllm.description></div>
+    </div>
+
+    <div class=form-group>
+        <label for=vllmServiceUrl data-l10n-ref=options.vllm.serviceUrl>&nbsp;</label>
+        <input id=vllmServiceUrl type=url placeholder=http://localhost:8000 data-required>
+        <div class=description data-l10n-ref=options.vllm.serviceUrl.description></div>
+    </div>
+
+    <div class=form-group>
+        <label for=vllmApiKey data-l10n-ref=options.vllm.apiKey>&nbsp;</label>
+        <input id=vllmApiKey is=password-toggle>
+        <div class=description data-l10n-ref=options.vllm.apiKey.description></div>
+    </div>
+
+    <div class=form-group>
+        <label for=vllmModel data-l10n-ref=options.vllm.model>&nbsp;</label>
+        <select id=vllmModel data-required></select>
+        <button type=button id=vllmListModel data-l10n-ref=options.vllm.listModelsButton>&nbsp;</button>
+
+        <div class="description vllm-error-api" data-l10n-ref=options.vllm.errorApi></div>
+        <div class="description vllm-warning-no-model" data-l10n-ref=options.vllm.warningNoModel></div>
+    </div>
+</fieldset>
+
 
             <div class="buttons form-group">
                 <button type=button class=test data-l10n-ref=options.testButton disabled>&nbsp;</button>
@@ -345,14 +498,12 @@
             </form>
         </main>
 
-        
+
         <script src="../vendor/purify.min.js"></script><script type=module src=/options/options.3f0e4c4a.js></script>
         <script type=module src=/options/options.d7ee3b22.js></script>
         <script type=module src=/options/options.52f831a4.js></script>
 
-        
+
         <script type=module src=/options/options.da35ad3a.js></script>
-        <script type=module src=/options/options.4bcf61b9.js></script>
-        <script type=module src=/options/options.da67942c.js></script>
-        <script type=module src=/options/options.6600a3f2.js></script>
+        <script type=module src=/options/options.64162e0f.js></script>
         <script type=module src=/options/options.d184e9e7.js></script>

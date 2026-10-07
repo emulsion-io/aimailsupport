@@ -2,7 +2,7 @@
     "manifest_version": 2,
     "name": "AI Mail Extended",
     "description": "__MSG_addonDescription__",
-    "version": "1.7.1",
+    "version": "1.8.0",
     "author": "Fabrice Simonet",
     "homepage_url": "https://emulsion.io",
     "default_locale": "fr",
@@ -22,17 +22,26 @@
         "messagesModify",
         "sensitiveDataUpload",
         "storage",
-        "https://api.anthropic.com/",
-        "https://api.openai.com/",
-        "https://api.x.ai/"
+        "https://api.anthropic.com/*",
+        "https://api.deepseek.com/*",
+        "https://api.groq.com/*",
+        "https://api.mistral.ai/*",
+        "https://api.openai.com/*",
+        "https://api.x.ai/*",
+        "https://generativelanguage.googleapis.com/*",
+        "https://openrouter.ai/*",
+        "http://localhost/*",
+        "http://127.0.0.1/*"
     ],
     "icons": {
-        "64": "images/icon-color-64.png",
+        "16": "images/icon-color-16.png",
         "32": "images/icon-color-32.png",
-        "16": "images/icon-color-16.png"
+        "64": "images/icon-color-64.png"
     },
     "background": {
-        "scripts": ["background.js"],
+        "scripts": [
+            "background.js"
+        ],
         "type": "module"
     },
     "compose_action": {

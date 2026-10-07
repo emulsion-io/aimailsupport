@@ -1,0 +1,2 @@
+51e2fc18d651d6c8eccff6912bad023e8c092821bdc0c887f4581ded2afeec94  ai-mail-extended-1.8.0.xpi
+b62e0c04ebd98e65759e8332134e84370bd5bd9f8d41e6196fc812e42d1e6f0c  ai-mail-extended-1.8.0-sources.zip

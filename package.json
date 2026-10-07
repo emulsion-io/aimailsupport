@@ -19,9 +19,10 @@
     "build": "npm run build:icons && npm run build:manifest && npm run build:locales && npm run build:addon",
     "build:package": "npm run build && cd ai-mail-support && zip -r -FS ../ai-mail-support.xpi * --exclude '*.DS_Store*'",
     "package": "node scripts/package.js",
-    "lint": "node_modules/.bin/eslint src/ts/*.ts",
+    "lint": "eslint \"src/ts/**/*.ts\"",
     "test": "jest",
-    "test:single": "jest -t"
+    "test:single": "jest -t",
+    "test:unit": "jest --runInBand --testPathIgnorePatterns=llmprovider.test.ts"
   },
   "devDependencies": {
     "@parcel/transformer-sass": "^2.16",
@@ -46,6 +47,7 @@
   "dependencies": {
     "@yellowsakura/js-pii-mask": "0.8.93",
     "dompurify": "^3.4.16",
+    "marked": "^18.0.0",
     "remove-markdown": "^0.6.2"
   }
 }

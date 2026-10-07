@@ -594,5 +594,167 @@
     "thinking": {
         "message": "Je réfléchis !",
         "description": "Texte affiché en attendant une réponse des services distants."
+    },
+    "errorServiceTimeout": {
+        "message": "Le service IA a dépassé le délai autorisé. Augmentez le délai dans les paramètres."
+    },
+    "localLlm.warningTimeout": {
+        "message": "<strong>Attention</strong> : les modèles locaux peuvent nécessiter davantage de temps. Adaptez le délai à votre machine."
+    },
+    "mailCheckErrors": {
+        "message": "Vérifier les erreurs"
+    },
+    "mailModerate.mistralClassification.criminal": {
+        "message": "Contenu criminel"
+    },
+    "mailModerate.mistralClassification.dangerous": {
+        "message": "Contenu dangereux"
+    },
+    "mailModerate.mistralClassification.jailbreaking": {
+        "message": "Contournement des consignes"
+    },
+    "options.deepseek.model": {
+        "message": "Modèle*"
+    },
+    "options.google.reasoningEffort": {
+        "message": "Niveau de raisonnement"
+    },
+    "options.google.reasoningEffort.description": {
+        "message": "Règle le raisonnement des modèles compatibles. Les niveaux élevés peuvent nécessiter un délai plus long."
+    },
+    "options.google.reasoningEffort.off": {
+        "message": "Minimal (plus rapide)"
+    },
+    "options.google.reasoningEffort.low": {
+        "message": "Faible"
+    },
+    "options.google.reasoningEffort.medium": {
+        "message": "Moyen"
+    },
+    "options.google.reasoningEffort.high": {
+        "message": "Élevé"
+    },
+    "options.llmTemperature.noTemperatureDescription": {
+        "message": "<strong>Attention</strong> : ce modèle ne permet pas de régler la température."
+    },
+    "options.ollama.reasoningEffort": {
+        "message": "Niveau de raisonnement"
+    },
+    "options.ollama.reasoningEffort.description": {
+        "message": "Règle le raisonnement des modèles Ollama compatibles."
+    },
+    "options.ollama.reasoningEffort.default": {
+        "message": "Réglage du modèle"
+    },
+    "options.ollama.reasoningEffort.none": {
+        "message": "Désactivé (plus rapide)"
+    },
+    "options.ollama.reasoningEffort.low": {
+        "message": "Faible"
+    },
+    "options.ollama.reasoningEffort.medium": {
+        "message": "Moyen"
+    },
+    "options.ollama.reasoningEffort.high": {
+        "message": "Élevé"
+    },
+    "options.ollama.reasoningEffort.max": {
+        "message": "Maximum"
+    },
+    "options.openaicompatible.apiKey": {
+        "message": "Clé API (facultative)"
+    },
+    "options.openaicompatible.apiKey.description": {
+        "message": "Laissez ce champ vide si le serveur ne nécessite pas d’authentification."
+    },
+    "options.openaicompatible.description": {
+        "message": "Connexion à un serveur proposant une API compatible OpenAI, par exemple llama.cpp, LocalAI ou vLLM. Un serveur distant doit autoriser les connexions Thunderbird via CORS."
+    },
+    "options.openaicompatible.errorApi": {
+        "message": "<strong>Attention</strong> : serveur inaccessible. Vérifiez son adresse, son démarrage, son API <code>/v1/models</code> et ses autorisations CORS."
+    },
+    "options.openaicompatible.listModelsButton": {
+        "message": "Lister les modèles"
+    },
+    "options.openaicompatible.model": {
+        "message": "Modèle*"
+    },
+    "options.openaicompatible.serviceUrl": {
+        "message": "URL du serveur*"
+    },
+    "options.openaicompatible.serviceUrl.description": {
+        "message": "Adresse du serveur, sans le suffixe <code>/v1/...</code>, par exemple <code>http://localhost:9931</code>."
+    },
+    "options.openaicompatible.warningNoModel": {
+        "message": "<strong>Attention</strong> : aucun modèle trouvé. Vérifiez qu’un modèle est disponible sur le serveur."
+    },
+    "options.openrouter.apiKey": {
+        "message": "Clé API*"
+    },
+    "options.openrouter.apiKey.description": {
+        "message": "Créez ou consultez votre clé sur la <a href=\"https://openrouter.ai/keys\">page des clés OpenRouter</a>."
+    },
+    "options.openrouter.listModelsButton": {
+        "message": "Lister les modèles"
+    },
+    "options.openrouter.model": {
+        "message": "Modèle*"
+    },
+    "options.streamResponses": {
+        "message": "Afficher les réponses progressivement"
+    },
+    "options.streamResponses.description": {
+        "message": "Affiche la réponse pendant sa génération. Cette option est facultative ; les appels natifs LM Studio avec le thinking désactivé restent affichés en une fois."
+    },
+    "options.vllm.apiKey": {
+        "message": "Clé API (facultative)"
+    },
+    "options.vllm.apiKey.description": {
+        "message": "Laissez ce champ vide si vLLM ne nécessite pas d’authentification."
+    },
+    "options.vllm.description": {
+        "message": "vLLM propose une API compatible OpenAI. Consultez la <a href=\"https://docs.vllm.ai\">documentation officielle</a> pour sa configuration."
+    },
+    "options.vllm.errorApi": {
+        "message": "<strong>Attention</strong> : serveur vLLM inaccessible. Vérifiez son adresse et ses autorisations CORS."
+    },
+    "options.vllm.listModelsButton": {
+        "message": "Lister les modèles"
+    },
+    "options.vllm.model": {
+        "message": "Modèle*"
+    },
+    "options.vllm.serviceUrl": {
+        "message": "URL du serveur*"
+    },
+    "options.vllm.serviceUrl.description": {
+        "message": "Adresse du serveur vLLM, par exemple <code>http://localhost:8000</code>."
+    },
+    "options.vllm.warningNoModel": {
+        "message": "<strong>Attention</strong> : aucun modèle disponible sur le serveur vLLM."
+    },
+    "options.xai.model": {
+        "message": "Modèle*"
+    },
+    "outputDisplay.refine.placeholder": {
+        "message": "Comment modifier cette réponse ?"
+    },
+    "outputDisplay.title.copyClipboard": {
+        "message": "Copier dans le presse-papiers"
+    },
+    "outputDisplay.title.copyTop": {
+        "message": "Insérer au début de l’email"
+    },
+    "outputDisplay.title.refine": {
+        "message": "Affiner cette réponse (plus courte, plus formelle…)"
+    },
+    "outputDisplay.title.stop": {
+        "message": "Arrêter la génération"
+    },
+    "options.reasoning.default": {
+        "message": "Réglage du modèle"
+    },
+    "options.llmProvider.dataDisclosure": {
+        "message": "À votre demande, le texte sélectionné ou le contenu et l’objet du message/brouillon, vos instructions et éventuellement les noms des étiquettes sont envoyés au fournisseur IA choisi. L’affinage inclut la réponse précédente. Les clés API servent à authentifier les demandes. Un serveur distant applique ses propres règles de confidentialité ; un serveur sur votre ordinateur reçoit les demandes localement. Le masquage facultatif ne garantit pas une anonymisation complète."
     }
 }

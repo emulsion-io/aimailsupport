@@ -1,11 +1,17 @@
 import { ProviderFactory } from './llmProviders/providerFactory'
-import { getConfig, getConfigs, getCurrentMessageContent, getLanguageNameFromCode, isComposeDisplayed, logMessage, sendMessageToActiveTab } from './helpers/utils'
+import { getConfig, getConfigs, getCurrentMessageContent, getLanguageNameFromCode, isComposeDisplayed, logMessage, sendMessageToTab } from './helpers/utils'
 
+import { RequestCoordinator } from './helpers/requestCoordinator'
+
+const requests = new RequestCoordinator(sendMessageToTab)
 
 // The array contains references to the menus of any custom languages selected
 // by the user for which a translation is requested.
 let translationMenuItemIds: (number | string)[] = null
 let customPromptMenuItemIds: (number | string)[] = null
+
+const menuIdCheckErrors = messenger.menus.create({ id: 'aiCheckErrors',
+    title: browser.i18n.getMessage('mailCheckErrors'), contexts: ['compose_action_menu', 'selection'] })
 
 // Create the menu entries -->
 const menuIdAnalyzeIntent = messenger.menus.create({
@@ -409,7 +415,8 @@ updateMenuVisibility()
 // <-- create the menu entries
 
 // Register a listener for the menus.onClicked events
-messenger.menus.onClicked.addListener(async (info: messenger.menus.OnClickData) => {
+messenger.menus.onClicked.addListener(async (info: messenger.menus.OnClickData, tab: messenger.tabs.Tab) => {
+    const tabId = tab.id
 
     // Handling scenarios that do not require LLM processing -->
     if([menuIdOptions, menuIdCustomPrompt].includes(info.menuItemId)) {
@@ -417,295 +424,268 @@ messenger.menus.onClicked.addListener(async (info: messenger.menus.OnClickData) 
             browser.runtime.openOptionsPage()
         }
         else if(info.menuItemId == menuIdCustomPrompt) {
-            sendMessageToActiveTab({showPromptDisplay: true})
+            sendMessageToTab(tabId, {showPromptDisplay: true})
         }
 
         return
     }
     // <-- handling scenarios that do not require LLM processing
 
-    const configs = await getConfigs()
-    const llmProvider = ProviderFactory.getInstance(configs)
+    const request = requests.begin(tabId)
+    try {
+        const configs = await getConfigs()
+        const llmProvider = ProviderFactory.getInstance(configs)
+        request.attach(llmProvider)
 
-    // Retrieving text for LLM processing regardless of the user-requested option,
-    // with the application of the general "thinking" output.
-    sendMessageToActiveTab({ type: 'thinking', content: messenger.i18n.getMessage('thinking') })
-    const textToBeProcessed = info.selectionText ?? await getCurrentMessageContent()
+        // Retrieving text for LLM processing regardless of the user-requested option,
+        // with the application of the general "thinking" output.
+        request.send({ type: 'thinking', content: messenger.i18n.getMessage('thinking') })
+        const textToBeProcessed = info.selectionText ?? await getCurrentMessageContent(tabId)
 
-    if (textToBeProcessed == null) {
-        sendMessageToActiveTab({ type: 'showError', content: messenger.i18n.getMessage('errorTextNotFound') })
-        return
-    }
-
-    // Determine if we're in compose mode and notify the content script first
-    const isCompose = await isComposeDisplayed()
-    sendMessageToActiveTab({ type: 'setComposeMode', isCompose: isCompose })
-
-    if(info.menuItemId == menuIdAnalyzeIntent) {
-        llmProvider.analyzeTextIntent(textToBeProcessed).then(intentAnalysisResult => {
-            sendMessageToActiveTab({ type: 'addText', content: intentAnalysisResult })
-        })
-        .catch(error => {
-            sendMessageToActiveTab({ type: 'showError', content: error.message })
-            logMessage(`Error during intent analysis: ${error.message}`, 'error')
-        })
-    }
-    else if(info.menuItemId == menuIdExplain) {
-        llmProvider.explainText(textToBeProcessed).then(textExplained => {
-            sendMessageToActiveTab({type: 'addText', content: textExplained})
-        }).catch(error => {
-            sendMessageToActiveTab({type: 'showError', content: error.message})
-            logMessage(`Error during explanation: ${error.message}`, 'error')
-        })
-    }
-    else if(info.menuItemId == menuIdSummarize) {
-        llmProvider.summarizeText(textToBeProcessed).then(textSummarized => {
-            sendMessageToActiveTab({type: 'addText', content: textSummarized})
-        }).catch(error => {
-            sendMessageToActiveTab({type: 'showError', content: error.message})
-            logMessage(`Error during summarization: ${error.message}`, 'error')
-        })
-    }
-    else if([menuIdRephraseStandard, menuIdRephraseFluid, menuIdRephraseCreative, menuIdRephraseSimple,
-            menuIdRephraseFormal, menuIdRephraseAcademic, menuIdRephraseExpanded, menuIdRephraseShortened,
-            menuIdRephrasePolite].includes(info.menuItemId)) {
-        // Extracts the tone of voice from the menuItemId by taking a substring
-        // starting from the 10th character.
-        // The value 10 corresponds to the length of the string 'aiRephrase',
-        // allowing the code to retrieve the portion of the menuItemId that
-        // follows 'aiRephrase'.
-        const toneOfVoice = (info.menuItemId as string).substring(10).toLowerCase()
-
-        llmProvider.rephraseText(textToBeProcessed, toneOfVoice).then(textRephrased => {
-            sendMessageToActiveTab({type: 'addText', content: textRephrased})
-        }).catch(error => {
-            sendMessageToActiveTab({type: 'showError', content: error.message})
-            logMessage(`Error during rephrasing: ${error.message}`, 'error')
-        })
-    }
-    else if(info.menuItemId == menuIdRephraseSummarizeKeyPoints) {
-        llmProvider.summarizeDraftKeyPoints(textToBeProcessed).then((summaryAsBullets: string) => {
-            sendMessageToActiveTab({ type: 'insertTextBelowSelection', content: summaryAsBullets })
-            sendMessageToActiveTab({ type: 'hideOutput', content: '' })
-        }).catch(error => {
-            sendMessageToActiveTab({type: 'showError', content: error.message})
-            logMessage(`Error during key points summarization from selection: ${error.message}`, 'error')
-        })
-    }
-    else if([menuIdSuggestReplyStandard, menuIdSuggestReplyFluid, menuIdSuggestReplyCreative, menuIdSuggestReplySimple,
-            menuIdSuggestReplyFormal, menuIdSuggestReplyAcademic, menuIdSuggestReplyExpanded, menuIdSuggestReplyShortened,
-            menuIdSuggestReplyPolite].includes(info.menuItemId)) {
-        // Extracts the tone of voice from the menuItemId by taking a substring
-        // starting from the 14th character.
-        // The value 14 corresponds to the length of the string 'aiSuggestReply',
-        // allowing the code to retrieve the portion of the menuItemId that
-        // follows 'aiRephrase'.
-        const toneOfVoice = (info.menuItemId as string).substring(14).toLowerCase()
-
-        llmProvider.suggestReplyFromText(textToBeProcessed, toneOfVoice).then(textSuggested => {
-            sendMessageToActiveTab({type: 'addText', content: textSuggested})
-        }).catch(error => {
-            sendMessageToActiveTab({type: 'showError', content: error.message})
-            logMessage(`Error during reply generation: ${error.message}`, 'error')
-        })
-    }
-    else if(info.menuItemId == menuIdSummarizeKeyPoints) {
-        llmProvider.summarizeDraftKeyPoints(textToBeProcessed).then((summaryAsBullets: string) => {
-            sendMessageToActiveTab({ type: 'insertTextAtCursor', content: summaryAsBullets })
-            sendMessageToActiveTab({ type: 'hideOutput', content: '' })
-        }).catch(error => {
-            sendMessageToActiveTab({type: 'showError', content: error.message})
-            logMessage(`Error during key points summarization: ${error.message}`, 'error')
-        })
-    }
-    else if(info.menuItemId == menuIdSummarizeAndText2Speech) {
-        try {
-            const textSummarized = await llmProvider.summarizeText(textToBeProcessed)
-            const blob = await llmProvider.getSpeechFromText(textSummarized)
-
-            sendMessageToActiveTab({type: 'addAudio', content: blob})
-        } catch (error) {
-            sendMessageToActiveTab({type: 'showError', content: error.message})
-            logMessage(`Error during summarization and text-to-speech: ${error.message}`, 'error')
-        }
-    }
-    else if(info.menuItemId == menuIdText2Speech) {
-        llmProvider.getSpeechFromText(textToBeProcessed).then(blob => {
-            sendMessageToActiveTab({type: 'addAudio', content: blob})
-        }).catch(error => {
-            sendMessageToActiveTab({type: 'showError', content: error.message})
-            logMessage(`Error during text-to-speech conversion: ${error.message}`, 'error')
-        })
-    }
-    else if(info.menuItemId == menuIdTranslate || translationMenuItemIds?.includes(info.menuItemId)) {
-        let languageCode = null
-
-        // The language code is retrieved when selected from a menu item that
-        // propagates the specific code in its ID.
-        const prefix = 'aiTranslateTo_'
-        if ((info.menuItemId as string).startsWith(prefix)) {
-            languageCode = (info.menuItemId as string).slice(prefix.length)
-        }
-
-        llmProvider.translateText(textToBeProcessed, languageCode).then(textTranslated => {
-            sendMessageToActiveTab({type: 'addText', content: textTranslated})
-        }).catch(error => {
-            sendMessageToActiveTab({type: 'showError', content: error.message})
-            logMessage(`Error during translation: ${error.message}`, 'error')
-        })
-    }
-    else if(info.menuItemId == menuIdTranslateAndSummarize) {
-        try {
-            const textTranslated = await llmProvider.translateText(textToBeProcessed)
-            const textTranslateAndSummarized = await llmProvider.summarizeText(textTranslated)
-
-            sendMessageToActiveTab({type: 'addText', content: textTranslateAndSummarized})
-        } catch (error) {
-            sendMessageToActiveTab({type: 'showError', content: error.message})
-            logMessage(`Error during translation and summarization: ${error.message}`, 'error')
-        }
-    }
-    else if(info.menuItemId == menuIdTranslateAndText2Speech) {
-        try {
-            const textTranslated = await llmProvider.translateText(textToBeProcessed)
-            const blob = await llmProvider.getSpeechFromText(textTranslated)
-
-            sendMessageToActiveTab({type: 'addAudio', content: blob})
-        } catch (error) {
-            sendMessageToActiveTab({type: 'showError', content: error.message})
-            logMessage(`Error during translation and text2Speech: ${error.message}`, 'error')
-        }
-    }
-    else if(info.menuItemId == menuIdModerate) {
-        llmProvider.moderateText(textToBeProcessed).then(moderatedResponse => {
-            sendMessageToActiveTab({type: 'addChart', content: moderatedResponse})
-        }).catch(error => {
-            sendMessageToActiveTab({type: 'showError', content: error.message})
-            logMessage(`Error during moderation: ${error.message}`, 'error')
-        })
-    }
-    else if(info.menuItemId == menuIdSuggestImprovements) {
-        llmProvider.suggestImprovementsForText(textToBeProcessed).then(improvedText => {
-            sendMessageToActiveTab({type: 'addText', content: improvedText})
-        }).catch(error => {
-            sendMessageToActiveTab({type: 'showError', content: error.message})
-            logMessage(`Error while improving the text: ${error.message}`, 'error')
-        })
-    }
-    else if((info.menuItemId as string).startsWith('aiSavedCustomPrompt_')) {
-        const promptIndex = Number.parseInt((info.menuItemId as string).replace('aiSavedCustomPrompt_', ''), 10)
-        const customPrompts = await getConfig('customPrompts') || []
-        const selectedCustomPrompt = customPrompts[promptIndex]
-
-        if(!selectedCustomPrompt?.prompt) {
-            sendMessageToActiveTab({type: 'showError', content: browser.i18n.getMessage('errorCustomPromptNotFound')})
+        if (textToBeProcessed == null) {
+            request.send({ type: 'showError', content: messenger.i18n.getMessage('errorTextNotFound') })
             return
         }
 
-        llmProvider.applyCustomPrompt(selectedCustomPrompt.prompt, textToBeProcessed).then(textProcessed => {
-            sendMessageToActiveTab({type: 'addText', content: textProcessed})
-        }).catch(error => {
-            sendMessageToActiveTab({type: 'showError', content: error.message})
-            logMessage(`Error during saved custom prompt: ${error.message}`, 'error')
-        })
-    }
-    else if(info.menuItemId == menuIdAutoTags) {
-        try {
-            const tabs = await messenger.tabs.query({ active: true, currentWindow: true })
-            const displayedMessage = await messenger.messageDisplay.getDisplayedMessage(tabs[0].id)
+        // Determine if we're in compose mode and notify the content script first
+        const isCompose = await isComposeDisplayed(tabId)
+        request.send({ type: 'setComposeMode', isCompose: isCompose })
 
-            if(!displayedMessage) {
-                sendMessageToActiveTab({type: 'showError', content: browser.i18n.getMessage('errorAutoTagsMessageNotAvailable')})
-                return
-            }
-
-            const availableTags = await messenger.messages.tags.list()
-
-            if(!availableTags || availableTags.length === 0) {
-                sendMessageToActiveTab({type: 'showError', content: browser.i18n.getMessage('errorAutoTagsNoAvailableTags')})
-                return
-            }
-
-            const messageSubject = displayedMessage.subject?.trim() || ''
-            const inputWithSubject = messageSubject
-                ? `Subject: ${messageSubject}\n\n${textToBeProcessed}`
-                : textToBeProcessed
-
-            const aiResponse = await llmProvider.suggestTagsForMessage(inputWithSubject, availableTags)
-            const suggestedTagKeys = extractSuggestedTagKeys(aiResponse, availableTags)
-
-            const mergedTags = Array.from(new Set([...(displayedMessage.tags || []), ...suggestedTagKeys]))
-
-            await messenger.messages.update(displayedMessage.id, { tags: mergedTags })
-
-            const tagsByKey = new Map(availableTags.map(tag => [tag.key, tag]))
-            const suggestedTagsForDisplay = suggestedTagKeys
-                .map((tagKey: string) => {
-                    const tag = tagsByKey.get(tagKey)
-                    if(!tag || !tag.tag) {
-                        return {
-                            label: tagKey,
-                            color: '#6b7280'
-                        }
-                    }
-
-                    return {
-                        label: tag.tag,
-                        color: tag.color || '#6b7280'
-                    }
-                })
-
-            if(suggestedTagsForDisplay.length > 0) {
-                sendMessageToActiveTab({
-                    type: 'addTagsSummary',
-                    content: {
-                        intro: browser.i18n.getMessage('autoTagsSuccessIntro') || "J'ai classé votre email dans :",
-                        tags: suggestedTagsForDisplay
-                    }
-                })
-            }
-            else {
-                sendMessageToActiveTab({
-                    type: 'addText',
-                    content: browser.i18n.getMessage('autoTagsSuccessMessage', [browser.i18n.getMessage('autoTagsNoTagApplied')])
-                })
-            }
-        } catch (error) {
-            sendMessageToActiveTab({type: 'showError', content: error.message || browser.i18n.getMessage('errorAutoTagsInvalidResponse')})
-            logMessage(`Error during auto tags assignment: ${error.message}`, 'error')
+        if(info.menuItemId == menuIdCheckErrors) {
+            await request.runText(onChunk => llmProvider.checkTextForErrors(textToBeProcessed, onChunk))
         }
-    }
-    // Fallback message case, but only if the menu does not match any values to
-    // ignore, e.g., options.
-    else if (!['aiOptions'].includes(info.menuItemId as string)) {
-        sendMessageToActiveTab({type: 'showError', content: `Invalid menu item selected: ${info.menuItemId}`})
-        logMessage(`Invalid menu item selected: ${info.menuItemId}`, 'error')
+        else if(info.menuItemId == menuIdAnalyzeIntent) {
+            await request.runText(onChunk => llmProvider.analyzeTextIntent(textToBeProcessed, onChunk))
+        }
+        else if(info.menuItemId == menuIdExplain) {
+            await request.runText(onChunk => llmProvider.explainText(textToBeProcessed, onChunk))
+        }
+        else if(info.menuItemId == menuIdSummarize) {
+            await request.runText(onChunk => llmProvider.summarizeText(textToBeProcessed, onChunk))
+        }
+        else if([menuIdRephraseStandard, menuIdRephraseFluid, menuIdRephraseCreative, menuIdRephraseSimple,
+                menuIdRephraseFormal, menuIdRephraseAcademic, menuIdRephraseExpanded, menuIdRephraseShortened,
+                menuIdRephrasePolite].includes(info.menuItemId)) {
+            // Extracts the tone of voice from the menuItemId by taking a substring
+            // starting from the 10th character.
+            // The value 10 corresponds to the length of the string 'aiRephrase',
+            // allowing the code to retrieve the portion of the menuItemId that
+            // follows 'aiRephrase'.
+            const toneOfVoice = (info.menuItemId as string).substring(10).toLowerCase()
+
+            await request.runText(onChunk => llmProvider.rephraseText(textToBeProcessed, toneOfVoice, onChunk))
+        }
+        else if(info.menuItemId == menuIdRephraseSummarizeKeyPoints) {
+            await llmProvider.summarizeDraftKeyPoints(textToBeProcessed).then((summaryAsBullets: string) => {
+                request.send({ type: 'insertTextBelowSelection', content: summaryAsBullets })
+                request.send({ type: 'hideOutput', content: '' })
+            }).catch(error => {
+                request.send({type: 'showError', content: errorMessage(error)})
+                logMessage(`Error during key points summarization from selection: ${error.message}`, 'error')
+            })
+        }
+        else if([menuIdSuggestReplyStandard, menuIdSuggestReplyFluid, menuIdSuggestReplyCreative, menuIdSuggestReplySimple,
+                menuIdSuggestReplyFormal, menuIdSuggestReplyAcademic, menuIdSuggestReplyExpanded, menuIdSuggestReplyShortened,
+                menuIdSuggestReplyPolite].includes(info.menuItemId)) {
+            // Extracts the tone of voice from the menuItemId by taking a substring
+            // starting from the 14th character.
+            // The value 14 corresponds to the length of the string 'aiSuggestReply',
+            // allowing the code to retrieve the portion of the menuItemId that
+            // follows 'aiRephrase'.
+            const toneOfVoice = (info.menuItemId as string).substring(14).toLowerCase()
+
+            await request.runText(onChunk => llmProvider.suggestReplyFromText(textToBeProcessed, toneOfVoice, onChunk))
+        }
+        else if(info.menuItemId == menuIdSummarizeKeyPoints) {
+            await llmProvider.summarizeDraftKeyPoints(textToBeProcessed).then((summaryAsBullets: string) => {
+                request.send({ type: 'insertTextAtCursor', content: summaryAsBullets })
+                request.send({ type: 'hideOutput', content: '' })
+            }).catch(error => {
+                request.send({type: 'showError', content: errorMessage(error)})
+                logMessage(`Error during key points summarization: ${error.message}`, 'error')
+            })
+        }
+        else if(info.menuItemId == menuIdSummarizeAndText2Speech) {
+            try {
+                const textSummarized = await llmProvider.summarizeText(textToBeProcessed)
+                const blob = await llmProvider.getSpeechFromText(textSummarized)
+
+                request.send({type: 'addAudio', content: blob})
+            } catch (error) {
+                request.send({type: 'showError', content: errorMessage(error)})
+                logMessage(`Error during summarization and text-to-speech: ${error.message}`, 'error')
+            }
+        }
+        else if(info.menuItemId == menuIdText2Speech) {
+            await llmProvider.getSpeechFromText(textToBeProcessed).then(blob => {
+                request.send({type: 'addAudio', content: blob})
+            }).catch(error => {
+                request.send({type: 'showError', content: errorMessage(error)})
+                logMessage(`Error during text-to-speech conversion: ${error.message}`, 'error')
+            })
+        }
+        else if(info.menuItemId == menuIdTranslate || translationMenuItemIds?.includes(info.menuItemId)) {
+            let languageCode = null
+
+            // The language code is retrieved when selected from a menu item that
+            // propagates the specific code in its ID.
+            const prefix = 'aiTranslateTo_'
+            if ((info.menuItemId as string).startsWith(prefix)) {
+                languageCode = (info.menuItemId as string).slice(prefix.length)
+            }
+
+            await request.runText(onChunk => llmProvider.translateText(textToBeProcessed, languageCode, onChunk))
+        }
+        else if(info.menuItemId == menuIdTranslateAndSummarize) {
+            await request.runText(async onChunk => llmProvider.summarizeText(await llmProvider.translateText(textToBeProcessed), onChunk))
+        }
+        else if(info.menuItemId == menuIdTranslateAndText2Speech) {
+            try {
+                const textTranslated = await llmProvider.translateText(textToBeProcessed)
+                const blob = await llmProvider.getSpeechFromText(textTranslated)
+
+                request.send({type: 'addAudio', content: blob})
+            } catch (error) {
+                request.send({type: 'showError', content: errorMessage(error)})
+                logMessage(`Error during translation and text2Speech: ${error.message}`, 'error')
+            }
+        }
+        else if(info.menuItemId == menuIdModerate) {
+            await llmProvider.moderateText(textToBeProcessed).then(moderatedResponse => {
+                request.send({type: 'addChart', content: moderatedResponse})
+            }).catch(error => {
+                request.send({type: 'showError', content: errorMessage(error)})
+                logMessage(`Error during moderation: ${error.message}`, 'error')
+            })
+        }
+        else if(info.menuItemId == menuIdSuggestImprovements) {
+            await request.runText(onChunk => llmProvider.suggestImprovementsForText(textToBeProcessed, onChunk))
+        }
+        else if((info.menuItemId as string).startsWith('aiSavedCustomPrompt_')) {
+            const promptIndex = Number.parseInt((info.menuItemId as string).replace('aiSavedCustomPrompt_', ''), 10)
+            const customPrompts = await getConfig('customPrompts') || []
+            const selectedCustomPrompt = customPrompts[promptIndex]
+
+            if(!selectedCustomPrompt?.prompt) {
+                request.send({type: 'showError', content: browser.i18n.getMessage('errorCustomPromptNotFound')})
+                return
+            }
+
+            await request.runText(onChunk => llmProvider.applyCustomPrompt(selectedCustomPrompt.prompt, textToBeProcessed, onChunk))
+        }
+        else if(info.menuItemId == menuIdAutoTags) {
+            try {
+                const displayedMessage = await messenger.messageDisplay.getDisplayedMessage(tabId)
+
+                if(!displayedMessage) {
+                    request.send({type: 'showError', content: browser.i18n.getMessage('errorAutoTagsMessageNotAvailable')})
+                    return
+                }
+
+                const availableTags = await messenger.messages.tags.list()
+
+                if(!availableTags || availableTags.length === 0) {
+                    request.send({type: 'showError', content: browser.i18n.getMessage('errorAutoTagsNoAvailableTags')})
+                    return
+                }
+
+                const aiResponse = await llmProvider.suggestTagsForMessage(textToBeProcessed, availableTags)
+                if (!request.isCurrent() || request.stopped) return
+                const suggestedTagKeys = extractSuggestedTagKeys(aiResponse, availableTags)
+
+                const mergedTags = Array.from(new Set([...(displayedMessage.tags || []), ...suggestedTagKeys]))
+
+                await messenger.messages.update(displayedMessage.id, { tags: mergedTags })
+
+                const tagsByKey = new Map(availableTags.map(tag => [tag.key, tag]))
+                const suggestedTagsForDisplay = suggestedTagKeys
+                    .map((tagKey: string) => {
+                        const tag = tagsByKey.get(tagKey)
+                        if(!tag || !tag.tag) {
+                            return {
+                                label: tagKey,
+                                color: '#6b7280'
+                            }
+                        }
+
+                        return {
+                            label: tag.tag,
+                            color: tag.color || '#6b7280'
+                        }
+                    })
+
+                if(suggestedTagsForDisplay.length > 0) {
+                    request.send({
+                        type: 'addTagsSummary',
+                        content: {
+                            intro: browser.i18n.getMessage('autoTagsSuccessIntro') || "J'ai classé votre email dans :",
+                            tags: suggestedTagsForDisplay
+                        }
+                    })
+                }
+                else {
+                    request.send({
+                        type: 'addText',
+                        content: browser.i18n.getMessage('autoTagsSuccessMessage', [browser.i18n.getMessage('autoTagsNoTagApplied')])
+                    })
+                }
+            } catch (error) {
+                request.send({type: 'showError', content: errorMessage(error) || browser.i18n.getMessage('errorAutoTagsInvalidResponse')})
+                logMessage(`Error during auto tags assignment: ${error.message}`, 'error')
+            }
+        }
+        // Fallback message case, but only if the menu does not match any values to
+        // ignore, e.g., options.
+        else if (!['aiOptions'].includes(info.menuItemId as string)) {
+            request.send({type: 'showError', content: `Invalid menu item selected: ${info.menuItemId}`})
+            logMessage(`Invalid menu item selected: ${info.menuItemId}`, 'error')
+        }
+    } catch (error) {
+        if (!request.stopped) await request.send({ type: 'showError', content: errorMessage(error) })
+    } finally {
+        if (request.stopped) await request.send({ type: 'endText' })
+        request.finish()
     }
 })
 
-// Register a listener for the action sent from promptDisplay
-browser.runtime.onMessage.addListener(async (message) => {
-  if (message.action === 'sendUserPromptToBackground') {
-    const configs = await getConfigs()
-    const llmProvider = ProviderFactory.getInstance(configs)
-
-    sendMessageToActiveTab({ type: 'thinking', content: messenger.i18n.getMessage('thinking') })
-
-    const currentMessageContent = await getCurrentMessageContent()
-
-    if(currentMessageContent == null) {
-        sendMessageToActiveTab({type: 'showError', content: messenger.i18n.getMessage('errorTextNotFound')})
+// Requests from the injected panels always use the sender's tab.
+browser.runtime.onMessage.addListener(async (message, sender) => {
+    const tabId = sender.tab?.id
+    if (tabId === undefined) return
+    if (message.type === 'stopGeneration') {
+        requests.stop(tabId, message.discardOutput === true, message.requestId)
+        return
     }
-    else {
-        llmProvider.applyCustomPrompt(message.data.userPrompt, currentMessageContent).then(textProcessed => {
-            sendMessageToActiveTab({type: 'addText', content: textProcessed})
-        }).catch(error => {
-            sendMessageToActiveTab({type: 'showError', content: error.message})
-            logMessage(`Error during the custom prompt: ${error.message}`, 'error')
-        })
+    if (message.type === 'insertAtComposeTop') {
+        try {
+            const compose = await messenger.compose.getComposeDetails(tabId)
+            if (compose.isPlainText) await messenger.compose.setComposeDetails(tabId,
+                { plainTextBody: `${message.textContent}\n\n${compose.plainTextBody || ''}` })
+            else await messenger.compose.setComposeDetails(tabId,
+                { body: `<div>${message.htmlContent}</div><br>${compose.body || ''}` })
+        } catch (error) { logMessage(`Error inserting generated text: ${errorMessage(error)}`, 'error') }
+        return
     }
-  }
+    if (message.action !== 'sendUserPromptToBackground' && message.type !== 'refineLastResponse') return
+    const request = requests.begin(tabId)
+    try {
+        const provider = ProviderFactory.getInstance(await getConfigs())
+        request.attach(provider)
+        const content = message.type === 'refineLastResponse' ? message.lastResponse : await getCurrentMessageContent(tabId)
+        if (!content) throw new Error(messenger.i18n.getMessage('errorTextNotFound'))
+        await request.send({ type: 'setComposeMode', isCompose: await isComposeDisplayed(tabId) })
+        await request.send({ type: 'thinking', content: messenger.i18n.getMessage('thinking') })
+        await request.runText(onChunk => provider.applyCustomPrompt(
+            message.type === 'refineLastResponse' ? message.refinementPrompt : message.data.userPrompt, content, onChunk))
+    } catch (error) {
+        if (!request.stopped) await request.send({ type: 'showError', content: errorMessage(error) })
+    } finally { request.finish() }
 })
+messenger.tabs.onRemoved.addListener(tabId => requests.stop(tabId, true))
+
+function errorMessage(error: any): string {
+    return error?.name === 'AbortError' ? messenger.i18n.getMessage('errorServiceTimeout') : error?.message || String(error)
+}
 
 /**
  * Using the messageDisplayScripts API for customizing the content displayed when
@@ -716,6 +696,7 @@ browser.runtime.onMessage.addListener(async (message) => {
  */
 messenger.messageDisplayScripts.register({
     js: [
+        { file: '/vendor/purify.min.js' },
         { file: '/outputDisplay/outputDisplay.js' },
         { file: '/promptDisplay/promptDisplay.js' }
     ],
@@ -734,6 +715,7 @@ messenger.messageDisplayScripts.register({
  */
 messenger.composeScripts.register({
     js: [
+        { file: '/vendor/purify.min.js' },
         { file: '/outputDisplay/outputDisplay.js' },
         { file: '/promptDisplay/promptDisplay.js' }
     ],
@@ -758,6 +740,8 @@ browser.runtime.onMessage.addListener(async (message) => {
 async function updateMenuVisibility(): Promise<void> {
     const configs = await getConfigs()
     const llmProvider = ProviderFactory.getInstance(configs)
+
+    messenger.menus.update(menuIdCheckErrors, { enabled: llmProvider.canCheckTextForErrors() })
 
     // canAnalyzeTextIntent -->
     messenger.menus.update(menuIdAnalyzeIntent, {

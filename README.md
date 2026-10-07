@@ -104,6 +104,22 @@ La case **Désactiver le mode thinking**, décochée par défaut, envoie `reason
 
 Enregistrez les paramètres avant de tester la connexion.
 
+### Nouveautés de la version 1.8.0
+
+- Résultats renvoyés à l’onglet ayant lancé la demande, même après un changement d’onglet.
+- Affichage Markdown nettoyé, bouton d’affinage et vérification des erreurs dans un brouillon.
+- Option **Afficher les réponses progressivement**, désactivée par défaut pour conserver le comportement existant. Le bouton Stop et la fermeture du panneau interrompent le traitement ; une ancienne réponse ne peut plus remplacer une nouvelle demande.
+- Fournisseurs OpenRouter, vLLM et API compatible OpenAI ; listes de modèles actualisables avec conservation du modèle enregistré si le serveur est inaccessible.
+- Réglages facultatifs de raisonnement pour Gemini et Ollama ; le réglage du modèle reste utilisé par défaut.
+- Token LM Studio et désactivation du thinking conservés. Les appels natifs avec le thinking désactivé restent sans streaming.
+- Insertion au début du brouillon par l’API Thunderbird, en HTML ou texte brut.
+
+Les serveurs distants doivent accepter les connexions Thunderbird via CORS. Les permissions réseau couvrent les domaines précis des fournisseurs et les adresses locales.
+
+Tests sans appels aux services IA : **npm run test:unit**.
+Paquet de release : **npm run build**, puis **npm run package -- ai-mail-extended-1.8.0.xpi**.
+Le fichier est créé dans **dist/** et conserve l’identifiant du fork pour mettre à jour l’installation existante. Voir le [changelog](CHANGELOG.md), la [notice de confidentialité](PRIVACY.md) et les [notes de publication](docs/RELEASE-1.8.0.md).
+
 ### Bug Owl for Exchange
 
 Si vous utilisez l'extension [Owl for Exchange](https://addons.thunderbird.net/en-us/thunderbird/addon/owl-for-exchange) pour gérer des comptes Exchange ou Office365, ⚠️ **il y a un bug connu** qui interfère avec l'[API scripting.messageDisplay](https://webextension-api.thunderbird.net/en/mv3/scripting.messageDisplay.html) et empêchera AI Mail Support for Thunderbird de fonctionner correctement lors de l'aperçu d'un email.
@@ -222,13 +238,13 @@ Cette commande génère les tailles et variantes requises utilisées dans `src/m
 
 Note : `npm run build` exécute déjà `npm run build:icons` avant de construire l'extension.
 
-Pour générer un fichier nommé ai-mail-support.xpi dans le dossier racine du projet, comme un package prêt pour l'installation en tant que module complémentaire dans Thunderbird, utilisez la commande suivante :
+Après `npm run build`, générez le paquet `dist/ai-mail-extended.xpi` avec :
 
 ```console
 $ npm run package
 ```
 
-Cette commande construit l'extension et la package dans un fichier .xpi dans le dossier `dist/`, compatible avec Windows, Linux et macOS.
+Cette commande empaquette les fichiers déjà construits dans `ai-mail-support/`. Elle est compatible avec Windows, Linux et macOS.
 
 Pour une compatibilité avec les systèmes Unix uniquement, vous pouvez également utiliser :
 

@@ -7,12 +7,12 @@ declare const DOMPurify: typeof import('dompurify')
  * Retrieve data from browser storage for a specific key.
  * Returns null if no data is found or an error occurs.
  *
- * @param key - The key to retrieve data from storage.
+ * @param {string} key - The key to retrieve data from storage.
  *
  * @returns A promise that resolves with the retrieved data, or null if an error
  *          occurs.
  */
-export async function getConfig(key: string): Promise<any> | null {
+export async function getConfig(key: string): Promise<any | null> {
     let config: any = null
 
     try {
@@ -53,11 +53,14 @@ export async function getConfigs(): Promise<ConfigType> | null {
  * If the plain text content is not available, it attempts to extract it from
  * the HTML content.
  *
+ * @param {number} tabId - Optional tab ID to retrieve the message from.
+ *        If not provided, falls back to querying the active tab in the
+ *        current window via messenger.tabs.query.
+ *
  * @returns A Promise resolving to the plain text content of the current message.
- *          Returns `null` if the content cannot be retrieved.
  */
-export async function getCurrentMessageContent(): Promise<string> {
-    const tabs = await messenger.tabs.query({ active: true, currentWindow: true })
+export async function getCurrentMessageContent(tabId?: number): Promise<string> {
+    const resolvedTabId = tabId ?? (await messenger.tabs.query({ active: true, currentWindow: true }))[0].id
 
     // The text of the current message is retrieved by distinguishing two cases:
     // whether we are dealing with an email being viewed, or whether we are in the
@@ -65,11 +68,12 @@ export async function getCurrentMessageContent(): Promise<string> {
     //
     // The second scenario is considered only if the messageDisplayed variable is
     // not valid.
-    const messageDisplayed = await messenger.messageDisplay.getDisplayedMessage(tabs[0].id)
-    const composeDetails = !messageDisplayed ? await messenger.compose.getComposeDetails(tabs[0].id) : null
+    const messageDisplayed = await messenger.messageDisplay.getDisplayedMessage(resolvedTabId)
+    const composeDetails = !messageDisplayed ? await messenger.compose.getComposeDetails(resolvedTabId) : null
 
     let fullHtml = null
     let fullPlain = null
+    let subject = null
 
     // Case: Email viewing -->
     if(messageDisplayed) {
@@ -84,12 +88,16 @@ export async function getCurrentMessageContent(): Promise<string> {
                 fullPlain = part.content
             }
         }
+
+        // Get the message subject
+        subject = (await messenger.messages.get(messageDisplayed.id)).subject
     }
     // <-- case: Email viewing
     // Case: Email creation or edit -->
     else if(composeDetails) {
         fullHtml = composeDetails.body
         fullPlain = composeDetails.plainTextBody
+        subject = composeDetails.subject
     }
     // <-- case: Email creation or edit
 
@@ -97,6 +105,9 @@ export async function getCurrentMessageContent(): Promise<string> {
         // @ts-expect-error - Thunderbird 128+ introduce messengerUtilities
         fullPlain = await messenger.messengerUtilities.convertToPlainText(fullHtml)
     }
+
+    // PII Mask
+    const isMaskPiiEnabled: boolean = await getConfig('maskPii')
 
     // Remove link (https and https), newlines and extra spaces before returning
     // the plain text
@@ -107,15 +118,18 @@ export async function getCurrentMessageContent(): Promise<string> {
             .replace(/\s{2,}/g, ' ')            // Replace multiple spaces with a single space
             .trim()                             // Remove leading/trailing spaces
 
-        // PII Mask
-        const isMaskPiiEnabled: boolean = await getConfig('maskPii')
-        if(isMaskPiiEnabled === true) {
-            logMessage('Masking PII...', 'debug')
+        if(isMaskPiiEnabled) {
+            logMessage('Masking PII for body...', 'debug')
             fullPlain = mask(fullPlain)
         }
     }
 
-    return fullPlain || null
+    if(subject && isMaskPiiEnabled) {
+        logMessage('Masking PII for subject...', 'debug')
+        subject = mask(subject)
+    }
+
+    return fullPlain ? `${subject ? `Subject: ${subject}\n` : ''}Body: ${fullPlain}` : null
 }
 
 /**
@@ -130,14 +144,19 @@ export async function isMessageDisplayed(): Promise<boolean> {
 }
 
 /**
- * Checks if the active tab is a compose window.
- * @returns True if the active tab is a compose window, false otherwise.
+ * Checks if the specified tab is a compose window.
+ *
+ * @param {number} tabId - Optional tab ID to check.
+ *        If not provided, falls back to querying the active tab in the current
+ *        window via messenger.tabs.query.
+ *
+ * @returns True if the tab is a compose window, false otherwise.
  */
-export async function isComposeDisplayed(): Promise<boolean> {
-    const tabs = await messenger.tabs.query({ active: true, currentWindow: true })
+export async function isComposeDisplayed(tabId?: number): Promise<boolean> {
+    const resolvedTabId = tabId ?? (await messenger.tabs.query({ active: true, currentWindow: true }))[0].id
 
     try {
-        const composeDetails = await messenger.compose.getComposeDetails(tabs[0].id)
+        const composeDetails = await messenger.compose.getComposeDetails(resolvedTabId)
         return !!composeDetails;
     }
     catch (error) {
@@ -157,17 +176,17 @@ export async function isComposeDisplayed(): Promise<boolean> {
  *         'it' to display names in Italian.
  *          If not specified, 'en' (English) is used as the default.
  *
- * @returns {string | undefined} The extended name of the language if found,
- *          otherwise undefined.
+ * @returns {string } The extended name of the language if found, otherwise
+ *          empty string.
  */
-export function getLanguageNameFromCode(languageCode: string, locale: string = 'en'): string | undefined {
+export function getLanguageNameFromCode(languageCode: string, locale: string = 'en'): string {
     const languageNames = new Intl.DisplayNames([locale], { type: 'language' })
 
     try {
-        return languageNames.of(languageCode)
+        return languageNames.of(languageCode) as string
     } catch (error) {
         logMessage(`Error in retrieving the language name from the code: ${error}`, 'error')
-        return undefined
+        return ''
     }
 }
 
@@ -194,18 +213,24 @@ export function localizeNodes(): void {
 }
 
 /**
+ * The console methods available for logging, restricted to a union so that the
+ * value can be used to index the Console object.
+ */
+export type LogMethod = 'debug' | 'error' | 'info' | 'log' | 'warn'
+
+/**
  * Logs a message to the console if the debug mode is enabled.
- * 
+ *
  * This function checks the configuration for the 'debugMode' setting.
- * If 'debugMode' is true, it will log the provided message using the specified 
+ * If 'debugMode' is true, it will log the provided message using the specified
  * console method (e.g., 'log', 'error', 'warn', 'info').
- * 
- * @param message - The message to log to the console.
- * @param method - The console method to use for logging. Defaults to 'log'.
- * 
+ *
+ * @param {string} message - The message to log to the console.
+ * @param {LogMethod} method - The console method to use for logging. Defaults to 'log'.
+ *
  * @returns A promise that resolves to void.
  */
-export async function logMessage(message: string, method: string = 'log'): Promise<void> {
+export async function logMessage(message: string, method: LogMethod = 'log'): Promise<void> {
     const isDebugModeEnabled: boolean = await getConfig('debugMode')
 
     if (isDebugModeEnabled === true) {
@@ -214,19 +239,19 @@ export async function logMessage(message: string, method: string = 'log'): Promi
 }
 
 /**
- * Sends a message to the currently active tab in the browser.
- * 
- * The function accepts two possible message formats:
- * 
- * 1. A structured message with 'type' and 'content' properties:
- *    - type: string identifying the message type
- *    - content: can be a Blob, string, or an index signature type
- *      { [key: string]: number } (used to manage graphs)
- * 2. Prompt display toggle format with a boolean to control prompt visibility
- * 
+ * Sends a message to the specified tab.
+ *
+ * A delivery failure is logged and swallowed: the target tab may well be gone
+ * by the time an answer is ready, and while streaming the same request sends
+ * many messages, so a rejection left unhandled would be a recurring one.
+ *
+ * @param {number} tabId - The ID of the target tab
  * @param message - The message payload, which must be one of:
  *        - { type: string; content: Blob | string | { [key: string]: number } }
  *          for structured messages with content
+ *        - { type: string }
+ *          for the messages that only mark a state change, like the beginning
+ *          and the end of a streamed answer
  *        - { type: 'setComposeMode'; isCompose: boolean }
  *          to notify about compose mode state changes
  *        - { type: 'hideOutput' }
@@ -234,16 +259,21 @@ export async function logMessage(message: string, method: string = 'log'): Promi
  *        - { showPromptDisplay: boolean }
  *          to toggle prompt display visibility
  *
- * @returns A Promise that resolves when the message has been sent successfully
+ * @returns A Promise that resolves once the message has been sent, or once the
+ *          failure has been logged
  */
-export async function sendMessageToActiveTab(
-    message: 
+export async function sendMessageToTab(
+    tabId: number,
+    message:
         | { type: string; content: Blob | string | { [key: string]: number } }
-    | { type: 'addTagsSummary'; content: { intro: string; tags: { label: string; color: string }[] } }
+        | { type: string }
         | { type: 'setComposeMode'; isCompose: boolean }
         | { type: 'hideOutput' }
         | { showPromptDisplay: boolean }
 ): Promise<void> {
-    const tabs = await browser.tabs.query({ active: true, currentWindow: true })
-    await browser.tabs.sendMessage(tabs[0].id, message)
+    try {
+        await browser.tabs.sendMessage(tabId, message)
+    } catch (error) {
+        logMessage(`Unable to deliver a message to the tab ${tabId}: ${error}`, 'debug')
+    }
 }

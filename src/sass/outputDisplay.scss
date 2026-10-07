@@ -418,3 +418,19 @@
         }
     }
 }
+
+#amsInnerResponse {
+    #amsFooter { margin-top: 8px; }
+    &.thinking #actionsContainer, &.streaming #actionsContainer { display: flex; }
+    #actionsContainer .stop-icon { display: none; }
+    &.thinking #actionsContainer, &.streaming #actionsContainer {
+        .stop-icon { display: inline-flex; }
+        .copy-clipboard-icon, .copy-top-icon, .refine-icon { display: none; }
+    }
+    &.streaming #amsContent { white-space: normal; }
+    &.text-content #amsContent { white-space: normal; }
+    #amsContent { p { margin: 0 0 8px; } pre { white-space: pre-wrap; } table { border-collapse: collapse; } th, td { border: 1px solid var(--border-color); padding: 4px; } }
+    #refineContainer { display: none; gap: 6px; align-items: flex-end; margin: 8px 60px 0 0; &.show { display: flex; } }
+    #refineTextarea { flex: 1; min-width: 0; max-height: 140px; resize: vertical; padding: 8px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-color); color: var(--text-color); }
+    .refine-send { padding: 6px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-color); color: var(--text-color); cursor: pointer; svg { width: 20px; height: 20px; fill: currentColor; } }
+}

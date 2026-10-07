@@ -1,47 +1,37 @@
-import { GenericProvider } from '../genericProvider'
+import { OpenAiApiCompatibleProvider } from '../abstractOpenAiApiCompatibleProvider'
+import { StreamCallback } from '../genericProvider'
 import { ConfigType } from '../../helpers/configType'
-import { getLanguageNameFromCode, logMessage } from '../../helpers/utils'
+import { logMessage } from '../../helpers/utils'
 
 /**
  * Class with the implementation of methods useful for interfacing with the
  * OpenAI APIs.
+ *
+ * The text operations are based on the "responses" endpoint instead of the
+ * OpenAI-compatible "chat/completions" one, so `manageMessageContent` is
+ * overridden, while everything else (prompts, headers, error handling) comes
+ * from the base class.
+ *
  * Official documentation: https://platform.openai.com/docs/api-reference
  */
-export class OpenAiGptProvider extends GenericProvider {
-    private readonly apiKey: string
+export class OpenAiGptProvider extends OpenAiApiCompatibleProvider {
     private readonly organizationId: string
-    private readonly model: string
     private readonly text2speechAudioQuality: string
     private readonly text2speechVoice: string
     private readonly text2speechSpeed: number
 
     public constructor(config: ConfigType) {
-        super(config)
+        super(config, {
+            serviceLabel: 'OpenAI',
+            baseUrl: 'https://api.openai.com',
+            model: config.openai.model,
+            apiKey: config.openai.apiKey
+        })
 
-        this.apiKey = config.openai.apiKey
         this.organizationId = config.openai.organizationId
-        this.model = config.openai.model
         this.text2speechAudioQuality = config.openai.text2speech.audioQuality
         this.text2speechVoice = config.openai.text2speech.voice
         this.text2speechSpeed = config.openai.text2speech.speed
-    }
-
-    public async analyzeTextIntent(input: string): Promise<string> {
-        logMessage(`Request to analyze text intent of ${input} in ${getLanguageNameFromCode(this.mainUserLanguageCode)}`, 'debug')
-
-        return this.manageMessageContent(this.PROMPTS.ANALYZE_INTENT.replace('%language%', getLanguageNameFromCode(this.mainUserLanguageCode)), input)
-    }
-
-    public async applyCustomPrompt(userPrompt: string, input: string): Promise<string> {
-        logMessage(`Applying custom user prompt "${userPrompt}" to input text: "${input}"`, 'debug')
-
-        return this.manageMessageContent(userPrompt, input)
-    }
-
-    public async explainText(input: string): Promise<string> {
-        logMessage(`Request to explain in ${getLanguageNameFromCode(this.mainUserLanguageCode)} the text: ${input}`, 'debug')
-
-        return this.manageMessageContent(this.PROMPTS.EXPLAIN.replace('%language%', getLanguageNameFromCode(this.mainUserLanguageCode)), input)
     }
 
     public async getSpeechFromText(input: string): Promise<Blob> {
@@ -54,109 +44,80 @@ export class OpenAiGptProvider extends GenericProvider {
         }
 
         const { signal, clearAbortSignalWithTimeout } = this.createAbortSignalWithTimeout(this.servicesTimeout)
+        try {
 
-        const requestData: string = JSON.stringify({
-            'model': this.text2speechAudioQuality,
-            'input': input,
-            'voice': this.text2speechVoice,
-            'speed': this.text2speechSpeed
-        })
+            const requestData: string = JSON.stringify({
+                'model': this.text2speechAudioQuality,
+                'input': input,
+                'voice': this.text2speechVoice,
+                'speed': this.text2speechSpeed
+            })
 
-        const requestOptions: RequestInit = {
-            method: 'POST',
-            headers: this.getHeaders(),
-            body: requestData,
-            redirect: 'follow',
-            signal: signal
+            const requestOptions: RequestInit = {
+                method: 'POST',
+                headers: this.getHeaders(),
+                body: requestData,
+                redirect: 'follow',
+                signal: signal
+            }
+
+            const response = await fetch(`${this.baseUrl}/v1/audio/speech`, requestOptions)
+
+            if (!response.ok) {
+                throw new Error(`${this.serviceLabel} error: ${await OpenAiGptProvider.extractErrorMessage(response)}`)
+            }
+
+            return await response.blob()
+
+        } finally {
+            clearAbortSignalWithTimeout()
         }
-
-        const response = await fetch('https://api.openai.com/v1/audio/speech', requestOptions)
-        clearAbortSignalWithTimeout()
-
-        if (!response.ok) {
-            const errorResponse = await response.json()
-            throw new Error(`OpenAI error: ${errorResponse.error.message}`)
-        }
-
-        return await response.blob()
     }
 
     // Classifies if text input is potentially harmful.
     // https://platform.openai.com/docs/api-reference/moderations
     public async moderateText(input: string): Promise<{ [key: string]: number }> {
         const { signal, clearAbortSignalWithTimeout } = this.createAbortSignalWithTimeout(this.servicesTimeout)
+        try {
 
-        const requestData = JSON.stringify({
-            'model': 'omni-moderation-latest',
-            'input': input
-        })
+            const requestData = JSON.stringify({
+                'model': 'omni-moderation-latest',
+                'input': input
+            })
 
-        const requestOptions: RequestInit = {
-            method: 'POST',
-            headers: this.getHeaders(),
-            body: requestData,
-            redirect: 'follow',
-            signal: signal
+            const requestOptions: RequestInit = {
+                method: 'POST',
+                headers: this.getHeaders(),
+                body: requestData,
+                redirect: 'follow',
+                signal: signal
+            }
+
+            const response = await fetch(`${this.baseUrl}/v1/moderations`, requestOptions)
+
+            if (!response.ok) {
+                throw new Error(`${this.serviceLabel} error: ${await OpenAiGptProvider.extractErrorMessage(response)}`)
+            }
+
+            const jsonData = await response.json()
+            return this.normalizeModerationResponse(jsonData)
+
+        } finally {
+            clearAbortSignalWithTimeout()
         }
-
-        const response = await fetch('https://api.openai.com/v1/moderations', requestOptions)
-        clearAbortSignalWithTimeout()
-
-        if (!response.ok) {
-            const errorResponse = await response.json()
-            throw new Error(`OpenAI error: ${errorResponse.error.message}`)
-        }
-
-        const jsonData = await response.json()
-        return this.normalizeModerationResponse(jsonData)
-    }
-
-    public async rephraseText(input: string, toneOfVoice: string): Promise<string> {
-        logMessage(`Request to use the tone of voice "${toneOfVoice}" to rephrase in ${getLanguageNameFromCode(this.mainUserLanguageCode)} the text: ${input}`, 'debug')
-
-        return this.manageMessageContent(this.PROMPTS.REPHRASE.replace('%language%', getLanguageNameFromCode(this.mainUserLanguageCode))
-            .replace('%toneOfVoice%', toneOfVoice), input)
-    }
-
-    public async suggestImprovementsForText(input: string): Promise<string> {
-        logMessage(`Request suggest improvements in ${getLanguageNameFromCode(this.mainUserLanguageCode)} for the text: ${input}`, 'debug')
-
-        return this.manageMessageContent(this.PROMPTS.SUGGEST_IMPROVEMENTS.replace('%language%', getLanguageNameFromCode(this.mainUserLanguageCode)), input)
-    }
-
-    public async suggestReplyFromText(input: string, toneOfVoice: string): Promise<string> {
-        logMessage(`Request to use the tone of voice "${toneOfVoice}" to suggest a reply in ${getLanguageNameFromCode(this.mainUserLanguageCode)} to the text: ${input}`, 'debug')
-
-        return this.manageMessageContent(this.PROMPTS.SUGGEST_REPLY.replace('%language%', getLanguageNameFromCode(this.mainUserLanguageCode))
-            .replace('%toneOfVoice%', toneOfVoice), input)
-    }
-
-    public async summarizeText(input: string): Promise<string> {
-        logMessage(`Request to summarize in ${getLanguageNameFromCode(this.mainUserLanguageCode)} the text: ${input} in ${getLanguageNameFromCode(this.mainUserLanguageCode)}`, 'debug')
-
-        return this.manageMessageContent(this.PROMPTS.SUMMARIZE.replace('%language%', getLanguageNameFromCode(this.mainUserLanguageCode)), input)
-    }
-
-    public async testIntegration(): Promise<void> {
-        await this.translateText('Hi!')
-    }
-
-    public async translateText(input: string, languageCode: string | null = null): Promise<string> {
-        languageCode = languageCode ?? this.mainUserLanguageCode
-        logMessage(`Request to translate in ${getLanguageNameFromCode(languageCode)} the text: ${input}`, 'debug')
-
-        return this.manageMessageContent(this.PROMPTS.TRANSLATE.replace('%language%', getLanguageNameFromCode(languageCode)), input)
     }
 
     /**
-     * Function to generate headers for API requests.
+     * Function to generate headers for API requests, adding the organization
+     * header to the standard ones when an organization ID is available.
+     *
+     * @param isStreaming - Whether the request expects a Server-Sent Events
+     *        response instead of a plain JSON one.
      *
      * @returns {Headers} The headers object with necessary headers appended.
      */
-    private getHeaders(): Headers {
-        const headers: Headers = new Headers()
-        headers.append('Authorization', `Bearer ${this.apiKey}`)
-        headers.append('Content-Type', 'application/json')
+    protected getHeaders(isStreaming: boolean = false): Headers {
+        const headers: Headers = super.getHeaders(isStreaming)
 
         if(this.organizationId) {
             headers.append('OpenAI-Organization', this.organizationId)
@@ -176,44 +137,127 @@ export class OpenAiGptProvider extends GenericProvider {
      * In case of failure, it throws an error with the specific message from
      * the OpenAI API.
      *
+     * When a callback is provided and streaming is enabled in the settings,
+     * the answer is requested as a Server-Sent Events stream and every piece
+     * of text is handed over as soon as it arrives. The whole text is returned
+     * at the end either way.
+     *
      * @param systemInput - The input for the 'system' role in the conversation.
      * @param userInput - The input for the 'user' role in the conversation.
+     * @param onChunk - Optional callback receiving the text as it is generated.
      *
      * @returns A promise that resolves to the content of the response message
      *          from the API.
      *
      * @throws An error if the API response is not successful.
      */
-    private async manageMessageContent(systemInput: string, userInput: string): Promise<string> {
+    protected async manageMessageContent(systemInput: string, userInput: string,
+            onChunk?: StreamCallback): Promise<string> {
+        const useStream = onChunk !== undefined && this.streamResponses
         const { signal, clearAbortSignalWithTimeout } = this.createAbortSignalWithTimeout(this.servicesTimeout)
+        try {
 
-        const requestData = JSON.stringify({
-            'model': this.model,
-            'input': [
-                { 'role': 'system', 'content': systemInput },
-                { 'role': 'user', 'content': userInput }
-            ],
-            'temperature': this.temperature
-        })
+            const requestData = JSON.stringify({
+                'model': this.model,
+                'store': false,
+                'input': [
+                    { 'role': 'system', 'content': systemInput },
+                    { 'role': 'user', 'content': userInput }
+                ],
+                // The temperature is omitted when the selected model does not
+                // accept it, since those models reject the parameter.
+                ...(this.temperature !== null && { 'temperature': this.temperature }),
+                ...(useStream && { 'stream': true })
+            })
 
-        const requestOptions: RequestInit = {
-            method: 'POST',
-            headers: this.getHeaders(),
-            body: requestData,
-            redirect: 'follow',
-            signal: signal
+            const requestOptions: RequestInit = {
+                method: 'POST',
+                headers: this.getHeaders(useStream),
+                body: requestData,
+                redirect: 'follow',
+                signal: signal
+            }
+
+            const response = await fetch(`${this.baseUrl}/v1/responses`, requestOptions)
+
+            // While streaming the timeout has to survive the headers, since the
+            // body is consumed afterwards: it is disarmed on the first chunk, as
+            // soon as the service actually starts answering.
+
+            if (!response.ok) {
+                throw new Error(`${this.serviceLabel} error: ${await OpenAiGptProvider.extractErrorMessage(response)}`)
+            }
+
+            if (useStream) {
+                return this.readResponsesStream(response, onChunk, clearAbortSignalWithTimeout)
+            }
+
+            const responseData = await response.json()
+
+            // Reasoning and message items may be interleaved; collect only output_text.
+            if (responseData.status === 'failed' || responseData.status === 'incomplete') {
+                throw new Error(`OpenAI error: ${responseData.error?.message || 'Incomplete response'}`)
+            }
+            const text = (responseData.output || [])
+                .filter((item: any) => item.type === 'message')
+                .flatMap((item: any) => item.content || [])
+                .filter((part: any) => part.type === 'output_text' && typeof part.text === 'string')
+                .map((part: any) => part.text).join('')
+            if (!text) throw new Error('OpenAI error: the response did not contain any text')
+            return text
+
+        } finally {
+            clearAbortSignalWithTimeout()
         }
+    }
 
-        const response = await fetch('https://api.openai.com/v1/responses', requestOptions)
-        clearAbortSignalWithTimeout()
+    /**
+     * Consumes the event stream of the "responses" endpoint, collecting the
+     * text of the answer.
+     *
+     * The endpoint emits typed events, of which only the text deltas of the
+     * assistant message are taken: the reasoning models also emit the deltas
+     * of their reasoning summary, which must not end up in the answer shown to
+     * the user.
+     *
+     * @param response - The streaming response returned by the service.
+     * @param onChunk - Callback receiving the text as it is generated.
+     * @param onFirstChunk - Called as soon as the service starts answering.
+     *
+     * @returns A promise that resolves to the whole generated text.
+     *
+     * @throws An error if the stream carries a failure event.
+     */
+    private async readResponsesStream(response: Response, onChunk: StreamCallback,
+            onFirstChunk: () => void): Promise<string> {
+        let fullText = ''
 
-        if (!response.ok) {
-            const errorResponse = await response.json()
-            throw new Error(`OpenAI error: ${errorResponse.error.message}`)
-        }
+        await this.readSseStream(response, data => {
+            let event: any
 
-        const responseData = await response.json()
-        return responseData.output[0].content[0].text
+            try {
+                event = JSON.parse(data)
+            } catch {
+                throw new Error('The service returned a malformed response stream')
+            }
+
+            switch (event.type) {
+                case 'response.completed': return false
+                case 'response.output_text.delta':
+                    if (event.delta) {
+                        fullText += event.delta
+                        onChunk(event.delta)
+                    }
+                    break
+
+                case 'response.failed':
+                case 'response.incomplete':
+                case 'error':
+                    throw new Error(`${this.serviceLabel} error: ${event.response?.error?.message ?? event.message ?? 'unknown streaming error'}`)
+            }
+        }, onFirstChunk)
+
+        return fullText
     }
 
     /**
@@ -235,13 +279,13 @@ export class OpenAiGptProvider extends GenericProvider {
                 // category.
                 // Each moderation category (e.g., "hate/threatening") has an
                 // associated name that may contain the "/" character, but
-                // since localization keys cannot contain "/", it’s necessary 
+                // since localization keys cannot contain "/", it’s necessary
                 // to replace "/" with "_",
                 // The string 'mailModerate.openaiClassification.' is concatenated
                 // with the modified category (where "/" is replaced with "_") to
                 // form a localization key. This key is then used to retrieve the
                 // translated text associated with that specific moderation category
-                // in line with OpenAI’s moderation documentation available at: 
+                // in line with OpenAI’s moderation documentation available at:
                 // https://platform.openai.com/docs/guides/moderation/quickstart?moderation-quickstart-examples=text
                 const translatedCategory = browser.i18n.getMessage('mailModerate.openaiClassification.' + category.replace(/\//g, '_'))
 
