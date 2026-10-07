@@ -38,13 +38,16 @@
                     <option disabled selected data-l10n-ref="options.llmProvider.default"></option>
                     <option value="anthropic">Anthropic Claude</option>
                     <option value="google">Google Gemini</option>
-                    <option value="groq">Groq cloud (Gemma, Llama, Mistral)</option>
+                    <option value="groq">Groq cloud (Gemma, Llama, Mistral, &hellip;)</option>
                     <option value="deepseek">Hangzhou DeepSeek AI</option>
-                    <option value="lms">LM Studio (Gemma, Llama, Mistral, Phi, StarCoder, &hellip;)</option>
+                    <option value="lms">LM Studio (Gemma, GLM, Mistral, &hellip;)</option>
                     <option value="mistral">Mistral</option>
-                    <option value="ollama">Ollama (Gemma, Llama, Mistral, Phi, &hellip;)</option>
+                    <option value="ollama">Ollama (Gemma, GLM, Mistral, &hellip;)</option>
+                    <option value="openaicompatible">OpenAI API compatible (llama.cpp, vLLM, &hellip;)</option>
                     <option value="openai">OpenAI GPT</option>
+                    <option value="openrouter">OpenRouter (Claude, GPT, Gemini, &hellip;)</option>
                     <option value="xai">xAI Grok</option>
+                    <option value="vllm">vLLM (Gemma, GLM, Mistral, &hellip;)</option>
                 </select>
 
                 <div class="description" data-l10n-ref="options.llmProvider.description"></div>
@@ -55,13 +58,21 @@
                 <input id="llmTemperature" data-required type="range" min="0" max="2" value="1" step="0.25">
 
                 <div class="description" data-l10n-ref="options.llmTemperature.description"></div>
+                <div class="description local-llm-warning-no-temperature" data-l10n-ref="options.llmTemperature.noTemperatureDescription"></div>
             </div>
 
             <div class="form-group">
                 <label for="servicesTimeout" data-l10n-ref="options.servicesTimeout">&nbsp;</label>
-                <input type="number" id="servicesTimeout" min="5" max="80" step="1" data-required>
+                <input type="number" id="servicesTimeout" min="5" max="120" step="1" data-required>
 
                 <div class="description local-llm-warning-timeout" data-l10n-ref="localLlm.warningTimeout"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="streamResponses" data-l10n-ref="options.streamResponses">&nbsp;</label>
+                <input type="checkbox" id="streamResponses">
+
+                <div class="description" data-l10n-ref="options.streamResponses.description"></div>
             </div>
 
             <div class="form-group">
@@ -69,6 +80,7 @@
                 <input type="checkbox" id="maskPii">
 
                 <div class="description" data-l10n-ref="options.maskPii.description"></div>
+
             </div>
 
             <div class="form-group">
@@ -123,8 +135,17 @@
             <!-- OpenAI GPT section -->
             <include src="partials/options-openai-gpt.html"></include><!-- /OpenAI GPT section -->
 
-            <!-- xAI Grok section -->
-            <include src="partials/options-xai-grok.html"></include><!-- /xAI Grok section -->
+            <!-- OpenAI API compatible section -->
+            <include src="partials/options-openai-compatible.html"></include><!-- /OpenAI API compatible section -->
+
+            <!-- OpenRouter section -->
+            <include src="partials/options-openrouter.html"></include><!-- /OpenRouter section -->
+
+            <!-- SpaceXAI Grok section -->
+            <include src="partials/options-xai-grok.html"></include><!-- /SpaceXAI Grok section -->
+
+            <!-- vLLM section -->
+            <include src="partials/options-vllm.html"></include><!-- /vLLM section -->
 
             <div class="form-group buttons">
                 <button type="button" class="test" data-l10n-ref="options.testButton" disabled>&nbsp;</button>
@@ -140,9 +161,7 @@
 
         <!-- Options: -->
         <script type="module" src="../ts/options/options.ts"></script>
-        <script type="module" src="../ts/options/optionsGroq.ts"></script>
-        <script type="module" src="../ts/options/optionsLms.ts"></script>
-        <script type="module" src="../ts/options/optionsOllama.ts"></script>
+        <script type="module" src="../ts/options/optionsModelList.ts"></script>
         <script type="module" src="../ts/options/optionsOpenai.ts"></script>
     </body>
 </html>

@@ -21,6 +21,8 @@ const configs: ConfigType = {
     temperature: 1,
     servicesTimeout: 30,
     debugMode: true,
+    maskPii: false,
+    theme: 'default',
 
     anthropic: {
         apiKey: null,
@@ -43,6 +45,7 @@ const configs: ConfigType = {
 
     mistral: {
         apiKey: null,
+        model: 'mistral-small-latest',
     },
 
     lms: {

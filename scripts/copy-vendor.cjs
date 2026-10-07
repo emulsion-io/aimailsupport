@@ -17,3 +17,13 @@ if (!html.includes(script)) {
     if (!html.includes('<script')) throw new Error('Options page has no script entry point')
     fs.writeFileSync(optionsPath, html.replace('<script', `${script}<script`).trimEnd() + '\n')
 }
+
+// Remove obsolete Parcel bundles so the package contains only current options assets.
+const currentHtml = fs.readFileSync(optionsPath, 'utf8')
+for (const entry of fs.readdirSync(path.dirname(optionsPath))) {
+    if (/^options\.[a-f0-9]+\.(js|css)$/.test(entry) && !currentHtml.includes(entry)) {
+        fs.unlinkSync(path.join(path.dirname(optionsPath), entry))
+    }
+}
+
+fs.writeFileSync(optionsPath, fs.readFileSync(optionsPath, 'utf8').replace(/[ \t]+$/gm, ''))

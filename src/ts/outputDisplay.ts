@@ -1,11 +1,33 @@
 import { ChartUtils } from './helpers/chartUtils'
 import { logMessage } from './helpers/utils'
 import removeMarkdown from 'remove-markdown'
+import { renderGeneratedText } from './helpers/renderGeneratedText'
+
+let lastAiResponseText = ''
+let streamedResponseText = ''
+let activeRequestId = 0
+let dismissedRequestId = 0
+let messageQueue = Promise.resolve()
 
 // Manage async messages -->
-browser.runtime.onMessage.addListener(async (message: any) => {
+browser.runtime.onMessage.addListener((message: any) => {
+    const accepted = ['addAudio', 'addChart', 'addText', 'addTagsSummary', 'insertTextAtCursor',
+        'insertTextBelowSelection', 'setComposeMode', 'showError', 'hideOutput', 'thinking',
+        'streamStart', 'addTextChunk', 'endText']
+    if (!accepted.includes(message?.type)) return false
+    messageQueue = messageQueue.then(() => handleMessage(message)).catch(error => logMessage(error.message, 'error'))
+    return false
+})
+
+async function handleMessage(message: any): Promise<void> {
+    if (message.requestId && (message.requestId < activeRequestId || message.requestId <= dismissedRequestId)) return
+    if (message.requestId) activeRequestId = message.requestId
     if (message?.type) {
         await createOutputDisplay()
+        if (message.requestId && message.requestId <= dismissedRequestId) {
+            clearOutputDisplay(true)
+            return
+        }
 
         switch (message.type) {
             case 'addAudio':
@@ -20,6 +42,20 @@ browser.runtime.onMessage.addListener(async (message: any) => {
                 addText(message.content)
                 break
 
+            case 'streamStart':
+                clearOutputDisplay()
+                streamedResponseText = ''
+                getInnerResponse().classList.add('streaming')
+                break
+            case 'addTextChunk':
+                streamedResponseText += message.content
+                renderGeneratedText(getInnerResponse().querySelector('#amsContent'), streamedResponseText)
+                break
+            case 'endText':
+                lastAiResponseText = streamedResponseText
+                getInnerResponse().classList.remove('thinking', 'streaming')
+                getInnerResponse().classList.add('text-content')
+                break
             case 'addTagsSummary':
                 addTagsSummary(message.content)
                 break
@@ -54,14 +90,16 @@ browser.runtime.onMessage.addListener(async (message: any) => {
                 break
         }
     }
-})
+}
 // <-- manage async messages
 
 function addAudio(blob: Blob) {
+    const requestId = activeRequestId
     clearOutputDisplay()
 
     const reader = new FileReader()
     reader.onload = () => {
+        if (requestId !== activeRequestId || requestId <= dismissedRequestId || !getInnerResponse()) return
         const base64Data = reader.result as string
 
         const audioElement = document.createElement('audio')
@@ -94,8 +132,8 @@ function addText(newContent: string) {
     getInnerResponse().classList.add('text-content')
 
     // Any Markdown present is converted to plain text
-    const rawText = normalizeDisplayedText(removeMarkdown(newContent))
-    getInnerResponse().querySelector('#amsContent').textContent = rawText
+    lastAiResponseText = newContent || ''
+    renderGeneratedText(getInnerResponse().querySelector('#amsContent'), lastAiResponseText)
 }
 
 function normalizeDisplayedText(content: string): string {
@@ -168,6 +206,8 @@ function showError(newContent: string) {
 }
 
 function thinking(thinkingText: string) {
+    streamedResponseText = ''
+    lastAiResponseText = ''
     clearOutputDisplay()
 
     getInnerResponse().classList.add('thinking')
@@ -272,7 +312,11 @@ async function createOutputDisplay(): Promise<void> {
     const closeIcon: HTMLSpanElement = document.createElement('span')
     closeIcon.className = 'close-icon'
     closeIcon.innerHTML = '&times;'
-    closeIcon.addEventListener('click', () => clearOutputDisplay(true))
+    closeIcon.addEventListener('click', () => {
+        dismissedRequestId = activeRequestId
+        stopGeneration(true)
+        clearOutputDisplay(true)
+    })
     amsInnerResponse.appendChild(closeIcon)
 
     // Actions container -->
@@ -282,6 +326,7 @@ async function createOutputDisplay(): Promise<void> {
     // Copy in clipboard icon
     const copyClipboardIcon: HTMLSpanElement = document.createElement('span')
     copyClipboardIcon.className = 'copy-clipboard-icon'
+    copyClipboardIcon.title = messenger.i18n.getMessage('outputDisplay.title.copyClipboard')
     copyClipboardIcon.innerHTML = `
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2m0 4h8m-8 4h6m-6 4h6"/>
@@ -295,6 +340,7 @@ async function createOutputDisplay(): Promise<void> {
     // Copy top icon
     const copyTopIcon: HTMLSpanElement = document.createElement('span')
     copyTopIcon.className = 'copy-top-icon'
+    copyTopIcon.title = messenger.i18n.getMessage('outputDisplay.title.copyTop')
     copyTopIcon.innerHTML = `
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 19V6"/>
@@ -316,7 +362,69 @@ async function createOutputDisplay(): Promise<void> {
     `
     actionsContainer.appendChild(reloadIcon)*/
 
-    amsInnerResponse.appendChild(actionsContainer)
+    // Refine icon
+    const refineIcon: HTMLSpanElement = document.createElement('span')
+    refineIcon.className = 'refine-icon'
+    refineIcon.title = messenger.i18n.getMessage('outputDisplay.title.refine')
+    refineIcon.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+        </svg>
+    `
+    refineIcon.addEventListener('click', () => toggleRefineInput(amsInnerResponse))
+    actionsContainer.appendChild(refineIcon)
+    // <-- refine icon
+
+    // Stop icon, only visible while an answer is being generated
+    const stopIcon: HTMLSpanElement = document.createElement('span')
+    stopIcon.className = 'stop-icon'
+    stopIcon.title = messenger.i18n.getMessage('outputDisplay.title.stop')
+    stopIcon.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <rect x="6" y="6" width="12" height="12" rx="2"/>
+        </svg>
+    `
+    stopIcon.addEventListener('click', () => stopGeneration())
+    actionsContainer.appendChild(stopIcon)
+
+    // Footer: groups action icons and refine input -->
+    const amsFooter: HTMLDivElement = document.createElement('div')
+    amsFooter.id = 'amsFooter'
+
+    amsFooter.appendChild(actionsContainer)
+
+    // Refine input area (hidden by default) -->
+    const refineContainer: HTMLDivElement = document.createElement('div')
+    refineContainer.id = 'refineContainer'
+
+    const refineTextarea: HTMLTextAreaElement = document.createElement('textarea')
+    refineTextarea.id = 'refineTextarea'
+    refineTextarea.rows = 1
+    refineTextarea.placeholder = messenger.i18n.getMessage('outputDisplay.refine.placeholder')
+    refineTextarea.addEventListener('input', () => {
+        refineTextarea.style.height = 'auto'
+        refineTextarea.style.height = `${refineTextarea.scrollHeight}px`
+        refineSendBtn.classList.toggle('active', refineTextarea.value.trim() !== '')
+    })
+    refineTextarea.addEventListener('keydown', (e: KeyboardEvent) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault()
+            submitRefinement(refineTextarea, refineContainer)
+        }
+    })
+    refineContainer.appendChild(refineTextarea)
+
+    const refineSendBtn: HTMLButtonElement = document.createElement('button')
+    refineSendBtn.className = 'refine-send'
+    refineSendBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>`
+    refineSendBtn.addEventListener('click', () => submitRefinement(refineTextarea, refineContainer))
+    refineContainer.appendChild(refineSendBtn)
+    // <-- refine input area
+
+    amsFooter.appendChild(refineContainer)
+    amsInnerResponse.appendChild(amsFooter)
+    // <-- footer
     // <-- actions container
 
     document.body.appendChild(amsOuterResponse)
@@ -331,7 +439,7 @@ async function createOutputDisplay(): Promise<void> {
  */
 function clearOutputDisplay(destroy: boolean = false): void {
     if(destroy) {
-        document.querySelector('#amsOuterResponse').remove()
+        document.querySelector('#amsOuterResponse')?.remove()
         return
     }
 
@@ -340,7 +448,7 @@ function clearOutputDisplay(destroy: boolean = false): void {
         document.querySelector('#amsOuterResponse').classList.add('show')
     }
 
-    getInnerResponse().classList.remove('error', 'text-content', 'thinking')
+    getInnerResponse().classList.remove('error', 'text-content', 'thinking', 'streaming')
     getInnerResponse().querySelector('#amsContent').innerHTML = ''
 }
 
@@ -373,29 +481,10 @@ function copyClipboard(): void {
  * This function is only available when in compose mode.
  */
 function copyToEmailTop(): void {
-    const contentElement = getInnerResponse().querySelector('#amsContent') as HTMLElement | null
-    const textToCopy: string = contentElement?.textContent?.trim() || ''
-
-    if (textToCopy) {
-        try {
-            // Get the current content of the email body
-            const emailBody: HTMLElement | null = document.querySelector('body')
-            if (emailBody) {
-                // Create a new paragraph with the AI-generated content
-                const aiContent: HTMLDivElement = document.createElement('div')
-                aiContent.textContent = textToCopy
-
-                // Insert at the beginning of the email body
-                emailBody.insertBefore(aiContent, emailBody.firstChild)
-            }
-        } catch (error) {
-            if (error instanceof Error) {
-                logMessage(`Error copying to email top: ${error.message}`, 'error')
-            } else {
-                logMessage('Unknown error copying to email top', 'error')
-            }
-        }
-    }
+    const content = getInnerResponse().querySelector('#amsContent')
+    if (!content?.textContent?.trim()) return
+    browser.runtime.sendMessage({ type: 'insertAtComposeTop', htmlContent: content.innerHTML,
+        textContent: (content as HTMLElement).innerText || content.textContent }).catch(error => logMessage(error.message, 'error'))
 }
 
 function insertTextAtCursor(contentToInsert: string): void {
@@ -516,4 +605,44 @@ function createInsertedContentNode(cleanedContent: string): HTMLDivElement {
     }
 
     return aiContent
+}
+
+function toggleRefineInput(amsInnerResponse: Element): void {
+    const container = amsInnerResponse.querySelector('#refineContainer') as HTMLDivElement
+    const isVisible = container.classList.toggle('show')
+    if (isVisible) {
+        (amsInnerResponse.querySelector('#refineTextarea') as HTMLTextAreaElement).focus()
+    }
+}
+
+/**
+ * Sends a refinement request to the background script, pairing the prompt typed
+ * by the user with the last AI response, which is the text to be reworked.
+ *
+ * Nothing is sent when the prompt is empty or when no response has been
+ * received yet. The input area is emptied and closed right away, while the new
+ * response arrives asynchronously and replaces the current one.
+ *
+ * @param textarea - The textarea holding the refinement prompt.
+ * @param container - The input area to be reset and hidden after sending.
+ */
+function submitRefinement(textarea: HTMLTextAreaElement, container: HTMLDivElement): void {
+    const prompt = textarea.value.trim()
+    if (!prompt || !lastAiResponseText) return
+
+    browser.runtime.sendMessage({
+        type: 'refineLastResponse',
+        refinementPrompt: prompt,
+        lastResponse: lastAiResponseText
+    }).catch((error: Error) => {
+        logMessage(`Error sending refinement: ${error.message}`, 'error')
+    })
+
+    textarea.value = ''
+    textarea.style.height = 'auto'
+    container.classList.remove('show')
+}
+function stopGeneration(discardOutput = false): void {
+    browser.runtime.sendMessage({ type: 'stopGeneration', discardOutput, requestId: activeRequestId })
+        .catch(error => logMessage(error.message, 'error'))
 }

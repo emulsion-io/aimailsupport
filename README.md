@@ -104,6 +104,22 @@ La case **Désactiver le mode thinking**, décochée par défaut, envoie `reason
 
 Enregistrez les paramètres avant de tester la connexion.
 
+### Améliorations intégrées sur la branche dev
+
+- Résultats renvoyés à l’onglet ayant lancé la demande, même après un changement d’onglet.
+- Affichage Markdown nettoyé, bouton d’affinage et vérification des erreurs dans un brouillon.
+- Option **Afficher les réponses progressivement**, désactivée par défaut pour conserver le comportement existant. Le bouton Stop et la fermeture du panneau interrompent le traitement ; une ancienne réponse ne peut plus remplacer une nouvelle demande.
+- Fournisseurs OpenRouter, vLLM et API compatible OpenAI ; listes de modèles actualisables avec conservation du modèle enregistré si le serveur est inaccessible.
+- Réglages facultatifs de raisonnement pour Gemini et Ollama ; le réglage du modèle reste utilisé par défaut.
+- Token LM Studio et désactivation du thinking conservés. Les appels natifs avec le thinking désactivé restent sans streaming.
+- Insertion au début du brouillon par l’API Thunderbird, en HTML ou texte brut.
+
+Les serveurs distants doivent accepter les connexions Thunderbird via CORS. Les permissions réseau couvrent les domaines précis des fournisseurs et les adresses locales.
+
+Tests sans appels aux services IA : **npm run test:unit**.
+Paquet de développement : **npm run build**, puis **npm run package -- ai-mail-extended-dev.xpi**.
+Le fichier est créé dans **dist/** et conserve l’identifiant et la version du fork ; il remplace l’installation existante lors d’un test.
+
 ### Bug Owl for Exchange
 
 Si vous utilisez l'extension [Owl for Exchange](https://addons.thunderbird.net/en-us/thunderbird/addon/owl-for-exchange) pour gérer des comptes Exchange ou Office365, ⚠️ **il y a un bug connu** qui interfère avec l'[API scripting.messageDisplay](https://webextension-api.thunderbird.net/en/mv3/scripting.messageDisplay.html) et empêchera AI Mail Support for Thunderbird de fonctionner correctement lors de l'aperçu d'un email.

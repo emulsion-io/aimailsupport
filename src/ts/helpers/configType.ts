@@ -5,8 +5,16 @@ export interface ConfigType {
     mainUserLanguageCode: string
     translationLanguageCodes: string[] // Array of ISO 639-1 codes (e.g. ['en', 'it', 'fr'])
     llmProvider: string
-    temperature: number
+
+    // A null value means that the currently selected model does not accept the
+    // temperature parameter at all (e.g. Anthropic Opus 5 or OpenAI GPT-5.5),
+    // in which case it must not be sent with the request.
+    temperature: number | null
     servicesTimeout: number
+
+    // Whether the answers are shown progressively, as the model generates
+    // them, instead of appearing all at once when the generation is over.
+    streamResponses?: boolean
     maskPii: boolean
     debugMode: boolean
     theme: string
@@ -22,11 +30,13 @@ export interface ConfigType {
 
     deepseek: {
         apiKey: string
+        model?: string
     }
 
     google: {
         apiKey: string
         model: string
+        reasoningEffort?: 'default' | 'off' | 'low' | 'medium' | 'high'
     }
 
     groq: {
@@ -49,6 +59,7 @@ export interface ConfigType {
     ollama: {
         serviceUrl: string
         model: string
+        reasoningEffort?: 'default' | 'none' | 'low' | 'medium' | 'high' | 'max'
     }
 
     openai: {
@@ -61,6 +72,25 @@ export interface ConfigType {
             voice: string
             speed: number
         }
+    }
+
+    // Generic provider for any service exposing an OpenAI-compatible API
+    // (llama.cpp, vLLM, ...), fully described by its own configuration.
+    openaicompatible?: {
+        serviceUrl: string
+        model: string
+        apiKey: string
+    }
+
+    openrouter?: {
+        apiKey: string
+        model: string
+    }
+
+    vllm?: {
+        serviceUrl: string
+        model: string
+        apiKey: string
     }
 
     xai: {

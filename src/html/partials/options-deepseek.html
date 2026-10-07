@@ -6,4 +6,14 @@
         <input id="deepseekApiKey" is="password-toggle" data-required>
         <div class="description" data-l10n-ref="options.deepseek.apiKey.description"></div>
     </div>
+
+    <!-- https://api-docs.deepseek.com/quick_start/pricing -->
+    <div class="form-group">
+        <label for="deepseekModel" data-l10n-ref="options.deepseek.model">&nbsp;</label>
+        <select id="deepseekModel" data-required>
+            <option value="deepseek-v4-pro">DeepSeek V4 Pro</option>
+            <option selected value="deepseek-flash">DeepSeek V4.1 Flash</option>
+            <option value="deepseek-chat">DeepSeek Chat</option>
+        </select>
+    </div>
 </fieldset>

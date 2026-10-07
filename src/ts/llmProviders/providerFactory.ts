@@ -12,7 +12,10 @@ import { GroqProvider } from './impl/groqProvider'
 import { LmsProvider } from './impl/lmsProvider'
 import { MistralProvider } from './impl/mistralProvider'
 import { OllamaProvider } from './impl/ollamaProvider'
+import { OpenAiCompatibleProvider } from './impl/openAiCompatibleProvider'
 import { OpenAiGptProvider } from './impl/openAiGptProvider'
+import { OpenRouterProvider } from './impl/openRouterProvider'
+import { VllmProvider } from './impl/vllmProvider'
 import { XaiGrokProvider } from './impl/xaiGrokProvider'
 
 // Static map to associate the provider name with the corresponding class
@@ -25,6 +28,9 @@ const providerMap: Record<string, new (config: ConfigType) => GenericProvider> =
     mistral: MistralProvider,
     ollama: OllamaProvider,
     openai: OpenAiGptProvider,
+    openaicompatible: OpenAiCompatibleProvider,
+    openrouter: OpenRouterProvider,
+    vllm: VllmProvider,
     xai: XaiGrokProvider
 }
 

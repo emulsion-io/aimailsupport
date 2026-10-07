@@ -104,6 +104,13 @@ The **Disable thinking mode** checkbox is unchecked by default. When checked, re
 
 Save the settings before testing the connection.
 
+### Improvements on the dev branch
+
+The dev branch adds tab-specific response routing, sanitized Markdown, inline response refinement, draft error checking, optional streaming with Stop/close cancellation, OpenRouter/vLLM/generic OpenAI-compatible providers and optional Gemini/Ollama reasoning controls. Streaming remains off by default. Existing LM Studio authentication and native thinking controls, French UI, Auto Tags and custom prompts are preserved. Native LM Studio requests with thinking disabled remain non-streaming.
+
+Remote servers must allow Thunderbird connections through CORS. Host permissions cover the specific provider domains and loopback addresses.
+Run **npm run test:unit** for offline regression tests. Build and package with **npm run build**, then **npm run package -- ai-mail-extended-dev.xpi**. The development package retains the fork ID and version and replaces an existing installation during testing.
+
 ### Owl for Exchange bug
 
 If you use the [Owl for Exchange](https://addons.thunderbird.net/en-us/thunderbird/addon/owl-for-exchange) add-on to manage Exchange or Office365 accounts, ⚠️ **there is a known bug** that interferes with the [scripting.messageDisplay API](https://webextension-api.thunderbird.net/en/mv3/scripting.messageDisplay.html) and will prevent AI Mail Support for Thunderbird from functioning correctly when previewing an email.

@@ -544,3 +544,9 @@ body.options-page[data-theme='dark'] {
         }
     }
 }
+body[data-provider='openaicompatible'] #openaicompatible,
+body[data-provider='openrouter'] #openrouter,
+body[data-provider='vllm'] #vllm { display: block; }
+#maskPiiNlpGroup, .local-llm-warning-no-temperature { display: none; &.show { display: block; } }
+body[data-provider='vllm'] .local-llm-warning-timeout,
+body[data-provider='openaicompatible'] .local-llm-warning-timeout { display: block; }
