@@ -104,12 +104,12 @@ The **Disable thinking mode** checkbox is unchecked by default. When checked, re
 
 Save the settings before testing the connection.
 
-### Improvements on the dev branch
+### New in version 1.8.0
 
-The dev branch adds tab-specific response routing, sanitized Markdown, inline response refinement, draft error checking, optional streaming with Stop/close cancellation, OpenRouter/vLLM/generic OpenAI-compatible providers and optional Gemini/Ollama reasoning controls. Streaming remains off by default. Existing LM Studio authentication and native thinking controls, French UI, Auto Tags and custom prompts are preserved. Native LM Studio requests with thinking disabled remain non-streaming.
+Version 1.8.0 adds tab-specific response routing, sanitized Markdown, inline response refinement, draft error checking, optional streaming with Stop/close cancellation, OpenRouter/vLLM/generic OpenAI-compatible providers and optional Gemini/Ollama reasoning controls. Streaming remains off by default. Existing LM Studio authentication and native thinking controls, French UI, Auto Tags and custom prompts are preserved. Native LM Studio requests with thinking disabled remain non-streaming.
 
 Remote servers must allow Thunderbird connections through CORS. Host permissions cover the specific provider domains and loopback addresses.
-Run **npm run test:unit** for offline regression tests. Build and package with **npm run build**, then **npm run package -- ai-mail-extended-dev.xpi**. The development package retains the fork ID and version and replaces an existing installation during testing.
+Run **npm run test:unit** for offline regression tests. Build and package with **npm run build**, then **npm run package -- ai-mail-extended-1.8.0.xpi**. The release retains the fork ID to update existing installations. See the [changelog](CHANGELOG.md), [privacy notice](PRIVACY.md) and [release notes](docs/RELEASE-1.8.0.md).
 
 ### Owl for Exchange bug
 
@@ -229,13 +229,13 @@ This command generates the required sizes and variants used in `src/manifest.jso
 
 Note: `npm run build` already runs `npm run build:icons` before building the add-on.
 
-To generate a file named ai-mail-support.xpi in the project's root folder, as a package ready for installation as an add-on in Thunderbird, use the following command:
+After `npm run build`, generate `dist/ai-mail-extended.xpi` with:
 
 ```console
 $ npm run package
 ```
 
-This command builds the add-on and packages it into a .xpi file in the `dist/` folder, compatible with Windows, Linux, and macOS.
+This command packages the files already built in `ai-mail-support/`. It works on Windows, Linux, and macOS.
 
 For compatibility with Unix-like systems only, you can also use:
 

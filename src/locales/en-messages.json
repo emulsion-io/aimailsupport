@@ -805,5 +805,8 @@
     },
     "options.reasoning.default": {
         "message": "Model default"
+    },
+    "options.llmProvider.dataDisclosure": {
+        "message": "At your request, the selected text or the message/draft content and subject, your instructions and, when needed, tag names are sent to your chosen AI provider. Refinement includes the previous response. API keys authenticate requests. A remote server applies its own privacy rules; a server on your computer receives requests locally. Optional masking does not guarantee complete anonymization."
     }
 }

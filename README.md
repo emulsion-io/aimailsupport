@@ -104,7 +104,7 @@ La case **Désactiver le mode thinking**, décochée par défaut, envoie `reason
 
 Enregistrez les paramètres avant de tester la connexion.
 
-### Améliorations intégrées sur la branche dev
+### Nouveautés de la version 1.8.0
 
 - Résultats renvoyés à l’onglet ayant lancé la demande, même après un changement d’onglet.
 - Affichage Markdown nettoyé, bouton d’affinage et vérification des erreurs dans un brouillon.
@@ -117,8 +117,8 @@ Enregistrez les paramètres avant de tester la connexion.
 Les serveurs distants doivent accepter les connexions Thunderbird via CORS. Les permissions réseau couvrent les domaines précis des fournisseurs et les adresses locales.
 
 Tests sans appels aux services IA : **npm run test:unit**.
-Paquet de développement : **npm run build**, puis **npm run package -- ai-mail-extended-dev.xpi**.
-Le fichier est créé dans **dist/** et conserve l’identifiant et la version du fork ; il remplace l’installation existante lors d’un test.
+Paquet de release : **npm run build**, puis **npm run package -- ai-mail-extended-1.8.0.xpi**.
+Le fichier est créé dans **dist/** et conserve l’identifiant du fork pour mettre à jour l’installation existante. Voir le [changelog](CHANGELOG.md), la [notice de confidentialité](PRIVACY.md) et les [notes de publication](docs/RELEASE-1.8.0.md).
 
 ### Bug Owl for Exchange
 
@@ -238,13 +238,13 @@ Cette commande génère les tailles et variantes requises utilisées dans `src/m
 
 Note : `npm run build` exécute déjà `npm run build:icons` avant de construire l'extension.
 
-Pour générer un fichier nommé ai-mail-support.xpi dans le dossier racine du projet, comme un package prêt pour l'installation en tant que module complémentaire dans Thunderbird, utilisez la commande suivante :
+Après `npm run build`, générez le paquet `dist/ai-mail-extended.xpi` avec :
 
 ```console
 $ npm run package
 ```
 
-Cette commande construit l'extension et la package dans un fichier .xpi dans le dossier `dist/`, compatible avec Windows, Linux et macOS.
+Cette commande empaquette les fichiers déjà construits dans `ai-mail-support/`. Elle est compatible avec Windows, Linux et macOS.
 
 Pour une compatibilité avec les systèmes Unix uniquement, vous pouvez également utiliser :
 

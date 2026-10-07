@@ -607,5 +607,8 @@
     },
     "options.theme": {
         "message": "Tema"
+    },
+    "options.llmProvider.dataDisclosure": {
+        "message": "Su tua richiesta, il testo selezionato o il contenuto e l’oggetto del messaggio/bozza, le tue istruzioni e, se necessario, i nomi delle etichette vengono inviati al fornitore IA scelto. Il perfezionamento include la risposta precedente. Le chiavi API autenticano le richieste. Un server remoto applica le proprie regole sulla privacy; un server sul tuo computer riceve le richieste localmente. Il mascheramento facoltativo non garantisce un’anonimizzazione completa."
     }
 }

@@ -753,5 +753,8 @@
     },
     "options.reasoning.default": {
         "message": "Réglage du modèle"
+    },
+    "options.llmProvider.dataDisclosure": {
+        "message": "À votre demande, le texte sélectionné ou le contenu et l’objet du message/brouillon, vos instructions et éventuellement les noms des étiquettes sont envoyés au fournisseur IA choisi. L’affinage inclut la réponse précédente. Les clés API servent à authentifier les demandes. Un serveur distant applique ses propres règles de confidentialité ; un serveur sur votre ordinateur reçoit les demandes localement. Le masquage facultatif ne garantit pas une anonymisation complète."
     }
 }
